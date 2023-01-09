@@ -50,6 +50,9 @@ const (
 	// ConfigMsg indicates message of type ORDERER_TRANSACTION or CONFIG.
 	// Messages of this type should be processed by ProcessConfigMsg
 	ConfigMsg
+
+	// AttestationMsg indicates message of type ATTESTATION_MESSAGE.
+	AttestationMsg
 )
 
 // Processor provides the methods necessary to classify and process any message which

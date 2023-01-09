@@ -27,6 +27,8 @@ import (
 	"github.com/hyperledger/fabric/core/ledger/pvtdatapolicy"
 	"github.com/hyperledger/fabric/core/ledger/util"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
+	"github.com/vldmkr/merkle-patricia-trie/storage"
 )
 
 var logger = flogging.MustGetLogger("lockbasedtxmgr")
@@ -44,6 +46,8 @@ type LockBasedTxMgr struct {
 	oldBlockCommit      sync.Mutex
 	currentUpdates      *currentUpdates
 	hashFunc            rwsetutil.HashFunc
+	stateTrie           *mpt.Trie
+	mptStorage          *storage.LevelDBAdapter
 }
 
 // pvtdataPurgeMgr wraps the actual purge manager and an additional flag 'usedOnce'
@@ -94,12 +98,32 @@ func NewLockBasedTxMgr(initializer *Initializer) (*LockBasedTxMgr, error) {
 	if err := initializer.DB.Open(); err != nil {
 		return nil, err
 	}
+
+	mptStorage, err := storage.NewLevelDBAdapter("/mptDB/peer/" + initializer.LedgerID)
+	if err != nil {
+		logger.Errorf("Error while init level db in /mptDB/peer/%s: %s", initializer.LedgerID, err)
+	}
+
+	rootHash, err := mptStorage.Get([]byte(initializer.LedgerID))
+	var stateTrie *mpt.Trie
+	if rootHash != nil && err == nil {
+		hashNode := mpt.HashNode(rootHash)
+		stateTrie = mpt.New(&hashNode, mptStorage)
+	} else {
+		if err != nil {
+			logger.Infof("Error while getting root hash for ledger %s: %s", initializer.LedgerID, err)
+		}
+		stateTrie = mpt.New(nil, mptStorage)
+	}
+
 	txmgr := &LockBasedTxMgr{
 		ledgerid:       initializer.LedgerID,
 		db:             initializer.DB,
 		stateListeners: initializer.StateListeners,
 		ccInfoProvider: initializer.CCInfoProvider,
 		hashFunc:       initializer.HashFunc,
+		stateTrie:      stateTrie,
+		mptStorage:     mptStorage,
 	}
 	pvtstatePurgeMgr, err := pvtstatepurgemgmt.InstantiatePurgeMgr(
 		initializer.LedgerID,
@@ -543,6 +567,12 @@ func (txmgr *LockBasedTxMgr) Commit() error {
 		txmgr.commitRWLock.Unlock()
 		return err
 	}
+
+	err := txmgr.updateMPT()
+	if err != nil {
+		return err
+	}
+
 	txmgr.commitRWLock.Unlock()
 	// only while holding a lock on oldBlockCommit, we should clear the cache as the
 	// cache is being used by the old pvtData committer to load the version of
@@ -557,6 +587,90 @@ func (txmgr *LockBasedTxMgr) Commit() error {
 	// In the case of error state listeners will not receive this call - instead a peer panic is caused by the ledger upon receiving
 	// an error from this function
 	txmgr.updateStateListeners()
+	return nil
+}
+
+func (txmgr *LockBasedTxMgr) updateMPT() error {
+	//todo причесать
+	for ns, nsBatch := range txmgr.currentUpdates.batch.PvtUpdates.UpdateMap {
+		for _, coll := range nsBatch.GetCollectionNames() {
+			for key, vv := range nsBatch.GetUpdates(coll) {
+				if vv.Value == nil {
+					err := txmgr.stateTrie.Put([]byte(ns+coll+key), nil)
+					if err != nil {
+						return err
+					}
+					continue
+				}
+
+				v := make([]byte, 0, len(vv.Metadata)+len(vv.Value)+len(vv.Version.ToBytes()))
+				v = append(v, vv.Metadata...)
+				v = append(v, vv.Value...)
+				v = append(v, vv.Version.ToBytes()...)
+
+				err := txmgr.stateTrie.Put([]byte(ns+coll+key), v)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	namespaces := txmgr.currentUpdates.batch.PubUpdates.GetUpdatedNamespaces()
+	for _, ns := range namespaces {
+		updates := txmgr.currentUpdates.batch.PubUpdates.GetUpdates(ns)
+		for k, vv := range updates {
+			if vv.Value == nil {
+				err := txmgr.stateTrie.Put([]byte(k), nil)
+				if err != nil {
+					return err
+				}
+				continue
+			}
+
+			v := make([]byte, 0, len(vv.Metadata)+len(vv.Value)+len(vv.Version.ToBytes()))
+			v = append(v, vv.Metadata...)
+			v = append(v, vv.Value...)
+			v = append(v, vv.Version.ToBytes()...)
+
+			err := txmgr.stateTrie.Put([]byte(k), v)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	for ns, nsBatch := range txmgr.currentUpdates.batch.HashUpdates.UpdateMap {
+		for _, coll := range nsBatch.GetCollectionNames() {
+			for key, vv := range nsBatch.GetUpdates(coll) {
+				if vv.Value == nil {
+					err := txmgr.stateTrie.Put([]byte(ns+coll+key), nil)
+					if err != nil {
+						return err
+					}
+					continue
+				}
+
+				v := make([]byte, 0, len(vv.Metadata)+len(vv.Value)+len(vv.Version.ToBytes()))
+				v = append(v, vv.Metadata...)
+				v = append(v, vv.Value...)
+				v = append(v, vv.Version.ToBytes()...)
+
+				err := txmgr.stateTrie.Put([]byte(ns+coll+key), v)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	txmgr.stateTrie.Commit()
+
+	err := txmgr.mptStorage.Put([]byte(txmgr.ledgerid), txmgr.stateTrie.RootHash())
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

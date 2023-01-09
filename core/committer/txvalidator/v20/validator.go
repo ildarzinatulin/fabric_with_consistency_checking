@@ -178,6 +178,8 @@ func (v *TxValidator) chainExists(chain string) bool {
 //     guaranteed to be alone in the block. If/when this assumption
 //     is violated, this code must be changed.
 func (v *TxValidator) Validate(block *common.Block) error {
+	// todo в случае блока аттестации проверять mpt
+
 	var err error
 	var errPos int
 
