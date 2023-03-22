@@ -160,6 +160,10 @@ func (mcs *ConsenterSupport) ProcessConfigMsg(env *cb.Envelope) (*cb.Envelope, u
 	return mcs.ProcessConfigMsgVal, mcs.ConfigSeqVal, mcs.ProcessConfigMsgErr
 }
 
+func (mcs *ConsenterSupport) ProcessAttestationMsg(env *cb.Envelope) (config *cb.Envelope, configSeq uint64, err error) {
+	panic("ProcessAttestationMsg is not implemented")
+}
+
 // Sequence returns SequenceVal
 func (mcs *ConsenterSupport) Sequence() uint64 {
 	return mcs.SequenceVal

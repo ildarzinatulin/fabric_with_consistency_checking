@@ -80,7 +80,7 @@ func TestProcessNormalMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider).ProcessNormalMsg(nil)
+		cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil).ProcessNormalMsg(nil)
 		require.Equal(t, cs, ms.SequenceVal)
 		require.Nil(t, err)
 	})
@@ -91,7 +91,7 @@ func TestProcessNormalMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		_, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider).ProcessNormalMsg(nil)
+		_, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil).ProcessNormalMsg(nil)
 		require.EqualError(t, err, "normal transactions are rejected: maintenance mode")
 	})
 }
@@ -105,7 +105,7 @@ func TestConfigUpdateMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		config, cs, err := NewStandardChannel(ms, NewRuleSet(nil), cryptoProvider).ProcessConfigUpdateMsg(&cb.Envelope{})
+		config, cs, err := NewStandardChannel(ms, NewRuleSet(nil), cryptoProvider, nil).ProcessConfigUpdateMsg(&cb.Envelope{})
 		require.Nil(t, config)
 		require.Equal(t, uint64(0), cs)
 		require.EqualError(t, err, "error applying config update to existing channel 'foo': An error")
@@ -118,7 +118,7 @@ func TestConfigUpdateMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		config, cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{EmptyRejectRule}), cryptoProvider).ProcessConfigUpdateMsg(&cb.Envelope{})
+		config, cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{EmptyRejectRule}), cryptoProvider, nil).ProcessConfigUpdateMsg(&cb.Envelope{})
 		require.Nil(t, config)
 		require.Equal(t, uint64(0), cs)
 		require.NotNil(t, err)
@@ -129,7 +129,7 @@ func TestConfigUpdateMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		config, cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider).ProcessConfigUpdateMsg(nil)
+		config, cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil).ProcessConfigUpdateMsg(nil)
 		require.Nil(t, config)
 		require.Equal(t, uint64(0), cs)
 		require.NotNil(t, err)
@@ -143,7 +143,7 @@ func TestConfigUpdateMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider)
+		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil)
 		stdChan.maintenanceFilter = AcceptRule
 		config, cs, err := stdChan.ProcessConfigUpdateMsg(nil)
 		require.NotNil(t, config)
@@ -161,7 +161,7 @@ func TestProcessConfigMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		_, _, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider).ProcessConfigMsg(&cb.Envelope{
+		_, _, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil).ProcessConfigMsg(&cb.Envelope{
 			Payload: protoutil.MarshalOrPanic(&cb.Payload{
 				Header: &cb.Header{
 					ChannelHeader: protoutil.MarshalOrPanic(&cb.ChannelHeader{
@@ -182,7 +182,7 @@ func TestProcessConfigMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider)
+		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil)
 		stdChan.maintenanceFilter = AcceptRule
 		config, cs, err := stdChan.ProcessConfigMsg(&cb.Envelope{
 			Payload: protoutil.MarshalOrPanic(&cb.Payload{

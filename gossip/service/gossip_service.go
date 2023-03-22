@@ -30,12 +30,14 @@ import (
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/gossip/state"
 	"github.com/hyperledger/fabric/gossip/util"
+	peercommon "github.com/hyperledger/fabric/internal/peer/common"
 	corecomm "github.com/hyperledger/fabric/internal/pkg/comm"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
 	"github.com/hyperledger/fabric/internal/pkg/peer/blocksprovider"
 	"github.com/hyperledger/fabric/internal/pkg/peer/orderers"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
 	"google.golang.org/grpc"
 )
 
@@ -173,6 +175,7 @@ type GossipService struct {
 	serviceConfig     *ServiceConfig
 	privdataConfig    *gossipprivdata.PrivdataConfig
 	anchorPeerTracker *anchorPeerTracker
+	signer            identity.SignerSerializer
 }
 
 // This is an implementation of api.JoinChannelMessage.
@@ -280,6 +283,7 @@ func New(
 		serviceConfig:     serviceConfig,
 		privdataConfig:    privdataConfig,
 		anchorPeerTracker: anchorPeerTracker,
+		signer:            peerIdentity,
 	}, nil
 }
 
@@ -319,6 +323,7 @@ type Support struct {
 	CollectionStore      privdata.CollectionStore
 	IdDeserializeFactory gossipprivdata.IdentityDeserializerFactory
 	CapabilityProvider   gossipprivdata.CapabilityProvider
+	StateTrie            *mpt.Trie
 }
 
 // InitializeChannel allocates the state provider and should be invoked once per channel per execution
@@ -342,6 +347,11 @@ func (g *GossipService) InitializeChannel(channelID string, ordererSource *order
 	}
 	selfSignedData := g.createSelfSignedData()
 	mspID := string(g.secAdv.OrgByPeerIdentity(selfSignedData.Identity))
+	broadcastClient, err := peercommon.GetBroadcastClient()
+	if err != nil {
+		logger.Errorf("Error while creating broadcast client for channel %s: %s", channelID, err)
+	}
+
 	coordinator := gossipprivdata.NewCoordinator(mspID, gossipprivdata.Support{
 		ChainID:            channelID,
 		CollectionStore:    support.CollectionStore,
@@ -349,8 +359,9 @@ func (g *GossipService) InitializeChannel(channelID string, ordererSource *order
 		Committer:          support.Committer,
 		Fetcher:            fetcher,
 		CapabilityProvider: support.CapabilityProvider,
+		Trie:               support.StateTrie,
 	}, store, selfSignedData, g.metrics.PrivdataMetrics, coordinatorConfig,
-		support.IdDeserializeFactory)
+		support.IdDeserializeFactory, broadcastClient, g.signer)
 
 	var reconciler gossipprivdata.PvtDataReconciler
 

@@ -26,7 +26,7 @@ import (
 	"github.com/hyperledger/fabric/internal/peer/common"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
-	"github.com/vldmkr/merkle-patricia-trie/storage"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
 )
 
 const pullRetrySleepInterval = time.Second
@@ -105,6 +105,7 @@ type Support struct {
 	committer.Committer
 	Fetcher
 	CapabilityProvider
+	*mpt.Trie
 }
 
 // CoordinatorConfig encapsulates the config that is passed to a new coordinator
@@ -131,19 +132,13 @@ type coordinator struct {
 	pullRetryThreshold             time.Duration
 	skipPullingInvalidTransactions bool
 	idDeserializerFactory          IdentityDeserializerFactory
-	trieStorage                    *storage.LevelDBAdapter
 	broadcastClient                common.BroadcastClient
 	signer                         common.Signer
 }
 
 // NewCoordinator creates a new instance of coordinator
 func NewCoordinator(mspID string, support Support, store *transientstore.Store, selfSignedData protoutil.SignedData, metrics *metrics.PrivdataMetrics,
-	config CoordinatorConfig, idDeserializerFactory IdentityDeserializerFactory) Coordinator {
-
-	mptStorage, err := storage.NewLevelDBAdapter("/mptDB/peer/" + support.ChainID)
-	if err != nil {
-		logger.Errorf("Error while init level db in /mptDB/peer/%s: %s", support.ChainID, err)
-	}
+	config CoordinatorConfig, idDeserializerFactory IdentityDeserializerFactory, broadcastClient common.BroadcastClient, signer common.Signer) Coordinator {
 
 	return &coordinator{
 		Support:                        support,
@@ -156,7 +151,8 @@ func NewCoordinator(mspID string, support Support, store *transientstore.Store, 
 		pullRetryThreshold:             config.PullRetryThreshold,
 		skipPullingInvalidTransactions: config.SkipPullingInvalidTransactions,
 		idDeserializerFactory:          idDeserializerFactory,
-		trieStorage:                    mptStorage,
+		broadcastClient:                broadcastClient,
+		signer:                         signer,
 	}
 }
 
@@ -256,17 +252,17 @@ func (c *coordinator) StoreBlock(block *cb.Block, privateDataSets util.PvtDataCo
 }
 
 func (c *coordinator) shouldSendAttestationMessage(block *cb.Block) bool {
-	return block.Header.GetNumber()%10 == 0 && block.Header.GetNumber() != 0
+	return block.Header.GetNumber()%10 == 0 && block.Header.GetNumber() != 0 // todo should be set by channel configuration
 }
 
 func (c *coordinator) sendAttestationMessage(lastBlockNumber uint64) error {
-	trieHead, err := c.trieStorage.Get([]byte(c.ChainID))
-	if err != nil {
-		c.logger.Errorf("Error while getting trie head %s", err)
-		return err
+	if c.Support.Trie == nil {
+		return nil
 	}
 
-	env, err := protoutil.CreateSignedEnvelope(cb.НeaderType_ATTESTATION, c.ChainID, c.signer, &cb.ConfigValue{Value: trieHead, Version: lastBlockNumber}, 0, 0)
+	trieHead := c.Support.Trie.RootHash()
+
+	env, err := protoutil.CreateSignedEnvelope(cb.НeaderType_ATTESTATION, c.ChainID, c.signer, &cb.Attestation{TrieHead: trieHead, BlockNumber: lastBlockNumber}, 0, 0)
 	if err != nil {
 		c.logger.Errorf("Error while getting trie head %s", err)
 		return err

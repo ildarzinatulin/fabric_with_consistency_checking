@@ -46,7 +46,7 @@ func TestConstructValidInvalidBlocksPvtData(t *testing.T) {
 	defer provider.Close()
 
 	blocksGenerator, gb := testutil.NewBlockGenerator(t, "testLedger", false)
-	lg, _ := provider.CreateFromGenesisBlock(gb)
+	lg, _ := provider.CreateFromGenesisBlock(gb, nil)
 	kvledger := lg.(*kvLedger)
 	defer kvledger.Close()
 

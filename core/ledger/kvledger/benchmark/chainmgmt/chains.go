@@ -69,7 +69,7 @@ func (m *chainsMgr) createOrOpenChains() []*Chain {
 			ledgerID := chainID.String()
 			gb, err := test.MakeGenesisBlock(ledgerID)
 			panicOnError(err)
-			peerLedger, err := m.ledgerMgr.CreateLedger(ledgerID, gb)
+			peerLedger, err := m.ledgerMgr.CreateLedger(ledgerID, gb, nil)
 			panicOnError(err)
 			c := newChain(chainID, peerLedger, m)
 			m.chainsMap[chainID] = c
@@ -78,7 +78,7 @@ func (m *chainsMgr) createOrOpenChains() []*Chain {
 	case ChainInitOpOpen:
 		for i := 0; i < numChains; i++ {
 			chainID := ChainID(i)
-			peerLedger, err := m.ledgerMgr.OpenLedger(chainID.String())
+			peerLedger, err := m.ledgerMgr.OpenLedger(chainID.String(), nil)
 			panicOnError(err)
 			c := newChain(chainID, peerLedger, m)
 			m.chainsMap[chainID] = c

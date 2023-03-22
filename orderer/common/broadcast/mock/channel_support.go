@@ -7,6 +7,7 @@ import (
 	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/orderer/common/broadcast"
 	"github.com/hyperledger/fabric/orderer/common/msgprocessor"
+	cb "github.com/hyperledger/fabric-protos-go/common"
 )
 
 type ChannelSupport struct {
@@ -242,6 +243,10 @@ func (fake *ChannelSupport) Order(arg1 *common.Envelope, arg2 uint64) error {
 	return fakeReturns.result1
 }
 
+func (fake *ChannelSupport) SendAttestationResult(arg1 *common.Envelope, arg2 uint64) error {
+	panic("Method SendAttestationResult is not implemented")
+}
+
 func (fake *ChannelSupport) OrderCallCount() int {
 	fake.orderMutex.RLock()
 	defer fake.orderMutex.RUnlock()
@@ -414,6 +419,10 @@ func (fake *ChannelSupport) ProcessConfigUpdateMsgReturnsOnCall(i int, result1 *
 		result2 uint64
 		result3 error
 	}{result1, result2, result3}
+}
+
+func (fake *ChannelSupport) ProcessAttestationMsg(env *cb.Envelope) (config *cb.Envelope, configSeq uint64, err error) {
+	panic("ProcessAttestationMsg is not implemented")
 }
 
 func (fake *ChannelSupport) ProcessNormalMsg(arg1 *common.Envelope) (uint64, error) {

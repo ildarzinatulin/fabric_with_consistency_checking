@@ -41,7 +41,7 @@ func TestConfigTxCreateLedger(t *testing.T) {
 	chanConf := helper.sampleChannelConfig(1, true)
 	genesisTx := helper.constructGenesisTx(t, channelID, chanConf)
 	genesisBlock := helper.constructBlock(genesisTx, 0, nil)
-	ledger, err := ledgerMgr.CreateLedger(channelID, genesisBlock)
+	ledger, err := ledgerMgr.CreateLedger(channelID, genesisBlock, nil)
 	require.NoError(t, err)
 
 	retrievedchanConf, err := RetrievePersistedChannelConfig(ledger)
@@ -82,7 +82,7 @@ func TestConfigTxUpdateChanConfig(t *testing.T) {
 	chanConf := helper.sampleChannelConfig(1, true)
 	genesisTx := helper.constructGenesisTx(t, channelID, chanConf)
 	genesisBlock := helper.constructBlock(genesisTx, 0, nil)
-	lgr, err := ledgerMgr.CreateLedger(channelID, genesisBlock)
+	lgr, err := ledgerMgr.CreateLedger(channelID, genesisBlock, nil)
 	require.NoError(t, err)
 
 	retrievedchanConf, err := RetrievePersistedChannelConfig(lgr)
@@ -102,7 +102,7 @@ func TestConfigTxUpdateChanConfig(t *testing.T) {
 
 	lgr.Close()
 	helper.clearMockChains()
-	_, err = ledgerMgr.OpenLedger(channelID)
+	_, err = ledgerMgr.OpenLedger(channelID, nil)
 	require.NoError(t, err)
 }
 
@@ -120,7 +120,7 @@ func TestGenesisBlockCreateLedger(t *testing.T) {
 		ledgerMgr.Close()
 	}()
 
-	lgr, err := ledgerMgr.CreateLedger("testchain", b)
+	lgr, err := ledgerMgr.CreateLedger("testchain", b, nil)
 	require.NoError(t, err)
 	chanConf, err := RetrievePersistedChannelConfig(lgr)
 	require.NoError(t, err)

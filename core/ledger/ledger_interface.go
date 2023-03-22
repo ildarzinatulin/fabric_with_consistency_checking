@@ -20,6 +20,7 @@ import (
 	"github.com/hyperledger/fabric/bccsp"
 	commonledger "github.com/hyperledger/fabric/common/ledger"
 	"github.com/hyperledger/fabric/common/metrics"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
 )
 
 const (
@@ -136,12 +137,12 @@ type PeerLedgerProvider interface {
 	// CreateFromGenesisBlock creates a new ledger with the given genesis block.
 	// This function guarantees that the creation of ledger and committing the genesis block would an atomic action
 	// The channel id retrieved from the genesis block is treated as a ledger id
-	CreateFromGenesisBlock(genesisBlock *common.Block) (PeerLedger, error)
+	CreateFromGenesisBlock(genesisBlock *common.Block, stateTrie *mpt.Trie) (PeerLedger, error)
 	// CreateFromSnapshot creates a new ledger from a snapshot and returns the ledger and channel id.
 	// The channel id retrieved from snapshot metadata is treated as a ledger id
 	CreateFromSnapshot(snapshotDir string) (PeerLedger, string, error)
 	// Open opens an already created ledger
-	Open(ledgerID string) (PeerLedger, error)
+	Open(ledgerID string, stateTrie *mpt.Trie) (PeerLedger, error)
 	// Exists tells whether the ledger with given id exists
 	Exists(ledgerID string) (bool, error)
 	// List lists the ids of the existing ledgers

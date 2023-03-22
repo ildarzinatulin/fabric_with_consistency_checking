@@ -74,4 +74,6 @@ type Processor interface {
 	// in it, and call `ProcessConfigUpdateMsg` to produce new Config message of the same type as original message.
 	// This method is used to re-validate and reproduce config message, if it's deemed not to be valid anymore.
 	ProcessConfigMsg(env *cb.Envelope) (*cb.Envelope, uint64, error)
+
+	ProcessAttestationMsg(env *cb.Envelope) (config *cb.Envelope, configSeq uint64, err error)
 }

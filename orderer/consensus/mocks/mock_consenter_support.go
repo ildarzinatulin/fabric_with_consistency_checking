@@ -10,6 +10,7 @@ import (
 	"github.com/hyperledger/fabric/orderer/common/msgprocessor"
 	"github.com/hyperledger/fabric/orderer/consensus"
 	"github.com/hyperledger/fabric/protoutil"
+	cb "github.com/hyperledger/fabric-protos-go/common"
 )
 
 type FakeConsenterSupport struct {
@@ -859,6 +860,10 @@ func (fake *FakeConsenterSupport) ProcessNormalMsgReturnsOnCall(i int, result1 u
 		result1 uint64
 		result2 error
 	}{result1, result2}
+}
+
+func (fake *FakeConsenterSupport) ProcessAttestationMsg(env *cb.Envelope) (config *cb.Envelope, configSeq uint64, err error) {
+	panic("ProcessAttestationMsg is not implemented")
 }
 
 func (fake *FakeConsenterSupport) Sequence() uint64 {

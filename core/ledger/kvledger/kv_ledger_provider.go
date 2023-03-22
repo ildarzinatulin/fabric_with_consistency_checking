@@ -28,6 +28,7 @@ import (
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
 )
 
 var (
@@ -269,7 +270,7 @@ func (p *Provider) initSnapshotDir() error {
 // CreateFromGenesisBlock implements the corresponding method from interface ledger.PeerLedgerProvider
 // This function creates a new ledger and commits the genesis block. If a failure happens during this
 // process, the partially created ledger is deleted
-func (p *Provider) CreateFromGenesisBlock(genesisBlock *common.Block) (ledger.PeerLedger, error) {
+func (p *Provider) CreateFromGenesisBlock(genesisBlock *common.Block, stateTrie *mpt.Trie) (ledger.PeerLedger, error) {
 	ledgerID, err := protoutil.GetChannelIDFromBlock(genesisBlock)
 	if err != nil {
 		return nil, err
@@ -283,7 +284,7 @@ func (p *Provider) CreateFromGenesisBlock(genesisBlock *common.Block) (ledger.Pe
 		return nil, err
 	}
 
-	lgr, err := p.open(ledgerID, nil, false)
+	lgr, err := p.open(ledgerID, nil, false, stateTrie)
 	if err != nil {
 		return nil, p.deleteUnderConstructionLedger(lgr, ledgerID, err)
 	}
@@ -316,7 +317,7 @@ func (p *Provider) deleteUnderConstructionLedger(ledger ledger.PeerLedger, ledge
 }
 
 // Open implements the corresponding method from interface ledger.PeerLedgerProvider
-func (p *Provider) Open(ledgerID string) (ledger.PeerLedger, error) {
+func (p *Provider) Open(ledgerID string, stateTrie *mpt.Trie) (ledger.PeerLedger, error) {
 	logger.Debugf("Open() opening kvledger: %s", ledgerID)
 	// Check the ID store to ensure that the chainId/ledgerId exists
 	ledgerMetadata, err := p.idStore.getLedgerMetadata(ledgerID)
@@ -334,10 +335,10 @@ func (p *Provider) Open(ledgerID string) (ledger.PeerLedger, error) {
 	if err != nil {
 		return nil, err
 	}
-	return p.open(ledgerID, bootSnapshotMetadata, false)
+	return p.open(ledgerID, bootSnapshotMetadata, false, stateTrie)
 }
 
-func (p *Provider) open(ledgerID string, bootSnapshotMetadata *SnapshotMetadata, initializingFromSnapshot bool) (ledger.PeerLedger, error) {
+func (p *Provider) open(ledgerID string, bootSnapshotMetadata *SnapshotMetadata, initializingFromSnapshot bool, stateTrie *mpt.Trie) (ledger.PeerLedger, error) {
 	// Get the block store for a chain/ledger
 	blockStore, err := p.blkStoreProvider.Open(ledgerID)
 	if err != nil {
@@ -380,6 +381,7 @@ func (p *Provider) open(ledgerID string, bootSnapshotMetadata *SnapshotMetadata,
 		config:                   p.initializer.Config,
 		bootSnapshotMetadata:     bootSnapshotMetadata,
 		initializingFromSnapshot: initializingFromSnapshot,
+		stateTrie:                stateTrie,
 	}
 
 	l, err := newKVLedger(initializer)

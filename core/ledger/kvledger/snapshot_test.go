@@ -57,7 +57,7 @@ func TestSnapshotGenerationAndNewLedgerCreation(t *testing.T) {
 
 	// add the genesis block and generate the snapshot
 	blkGenerator, genesisBlk := testutil.NewBlockGenerator(t, "testLedgerid", false)
-	lgr, err := provider.CreateFromGenesisBlock(genesisBlk)
+	lgr, err := provider.CreateFromGenesisBlock(genesisBlk, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 	kvlgr := lgr.(*kvLedger)
@@ -215,7 +215,7 @@ func TestSnapshotDBTypeCouchDB(t *testing.T) {
 	defer provider.Close()
 
 	_, genesisBlk := testutil.NewBlockGenerator(t, "testLedgerid", false)
-	lgr, err := provider.CreateFromGenesisBlock(genesisBlk)
+	lgr, err := provider.CreateFromGenesisBlock(genesisBlk, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 	kvlgr := lgr.(*kvLedger)
@@ -246,7 +246,7 @@ func TestSnapshotCouchDBIndexCreation(t *testing.T) {
 
 		// add the genesis block and generate the snapshot
 		blkGenerator, genesisBlk := testutil.NewBlockGenerator(t, "test_ledger", false)
-		lgr, err := provider.CreateFromGenesisBlock(genesisBlk)
+		lgr, err := provider.CreateFromGenesisBlock(genesisBlk, nil)
 		require.NoError(t, err)
 		t.Cleanup(lgr.Close)
 		kvlgr := lgr.(*kvLedger)
@@ -531,14 +531,14 @@ func TestGenerateSnapshotErrors(t *testing.T) {
 
 	// create a ledger
 	_, genesisBlk := testutil.NewBlockGenerator(t, "testLedgerid", false)
-	lgr, err := provider.CreateFromGenesisBlock(genesisBlk)
+	lgr, err := provider.CreateFromGenesisBlock(genesisBlk, nil)
 	require.NoError(t, err)
 	kvlgr := lgr.(*kvLedger)
 
 	closeAndReopenLedgerProvider := func() {
 		provider.Close()
 		provider = testutilNewProvider(conf, t, &mock.DeployedChaincodeInfoProvider{})
-		lgr, err = provider.Open("testLedgerid")
+		lgr, err = provider.Open("testLedgerid", nil)
 		require.NoError(t, err)
 		kvlgr = lgr.(*kvLedger)
 	}

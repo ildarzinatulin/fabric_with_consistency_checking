@@ -210,7 +210,7 @@ func TestResetLedgerWithoutDroppingDBs(t *testing.T) {
 	t.Logf("preResetHt = %#v", preResetHt)
 	require.NoError(t, err)
 	require.Equal(t, uint64(9), preResetHt["ledger-1"])
-	_, err = env.ledgerMgr.OpenLedger("ledger-1")
+	_, err = env.ledgerMgr.OpenLedger("ledger-1", nil)
 	// populateLedger() stores 8 block in total
 	require.EqualError(t, err, "the state database [height=9] is ahead of the block store [height=1]. "+
 		"This is possible when the state database is not dropped after a ledger reset/rollback. "+

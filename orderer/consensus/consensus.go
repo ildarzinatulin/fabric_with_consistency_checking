@@ -54,9 +54,9 @@ type MetadataValidator interface {
 // Note, that in order to allow flexibility in the implementation, it is the responsibility of the implementer
 // to take the ordered messages, send them through the blockcutter.Receiver supplied via HandleChain to cut blocks,
 // and ultimately write the ledger also supplied via HandleChain.  This design allows for two primary flows
-// 1. Messages are ordered into a stream, the stream is cut into blocks, the blocks are committed (deprecated, orderer
-//    no longer supports solo & kafka)
-// 2. Messages are cut into blocks, the blocks are ordered, then the blocks are committed (etcdraft)
+//  1. Messages are ordered into a stream, the stream is cut into blocks, the blocks are committed (deprecated, orderer
+//     no longer supports solo & kafka)
+//  2. Messages are cut into blocks, the blocks are ordered, then the blocks are committed (etcdraft)
 type Chain interface {
 	// Order accepts a message which has been processed at a given configSeq.
 	// If the configSeq advances, it is the responsibility of the consenter
@@ -71,6 +71,8 @@ type Chain interface {
 	// discarding the message if the reconfiguration is no longer valid.
 	// The consenter may return an error, indicating the message was not accepted
 	Configure(config *cb.Envelope, configSeq uint64) error
+
+	SendAttestationResult(config *cb.Envelope, configSeq uint64) error
 
 	// WaitReady blocks waiting for consenter to be ready for accepting new messages.
 	// This is useful when consenter needs to temporarily block ingress messages so

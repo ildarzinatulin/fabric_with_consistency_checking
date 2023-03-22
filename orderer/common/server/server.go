@@ -25,7 +25,6 @@ import (
 	"github.com/hyperledger/fabric/orderer/common/multichannel"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 type broadcastSupport struct {
@@ -92,17 +91,11 @@ func NewServer(
 	mutualTLS bool,
 	expirationCheckDisabled bool,
 ) ab.AtomicBroadcastServer {
-	attestationMessagesStorage, err := leveldb.OpenFile("/mptDB/orderer/attestationMessagesStorage", nil)
-	if err != nil {
-		logger.Errorf("Error while init level db in /mptDB/orderer/attestationMessagesStorage: %s", err)
-	}
-
 	s := &server{
 		dh: deliver.NewHandler(deliverSupport{Registrar: r}, timeWindow, mutualTLS, deliver.NewMetrics(metricsProvider), expirationCheckDisabled),
 		bh: &broadcast.Handler{
-			SupportRegistrar:           broadcastSupport{Registrar: r},
-			Metrics:                    broadcast.NewMetrics(metricsProvider),
-			AttestationMessagesStorage: attestationMessagesStorage,
+			SupportRegistrar: broadcastSupport{Registrar: r},
+			Metrics:          broadcast.NewMetrics(metricsProvider),
 		},
 		debug:     debug,
 		Registrar: r,

@@ -346,16 +346,6 @@ func (h *Handler) deliverBlocks(ctx context.Context, srv *Server, envelope *cb.E
 	return cb.Status_SUCCESS, nil
 }
 
-// todo
-func (h *Handler) sendAttestationMessage() error {
-	/*signedData := &protoutil.SignedData{Data: envelope.Payload, Identity: shdr.Creator, Signature: envelope.Signature}
-	if err := srv.SendBlockResponse(block, chdr.ChannelId, chain, signedData); err != nil { //вместо SendBlockResponse что-то другое надо реализовать
-		logger.Warningf("[channel: %s] Error sending to %s: %s", chdr.ChannelId, addr, err)
-		return cb.Status_INTERNAL_SERVER_ERROR, err
-	}*/
-	return nil
-}
-
 func (h *Handler) parseEnvelope(ctx context.Context, envelope *cb.Envelope) (*cb.Payload, *cb.ChannelHeader, *cb.SignatureHeader, error) {
 	payload, err := protoutil.UnmarshalPayload(envelope.Payload)
 	if err != nil {

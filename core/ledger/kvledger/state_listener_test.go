@@ -43,7 +43,7 @@ func TestStateListener(t *testing.T) {
 	}
 
 	bg, gb := testutil.NewBlockGenerator(t, channelid, false)
-	lgr, err := provider.CreateFromGenesisBlock(gb)
+	lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	// Simulate tx1
 	sim1, err := lgr.NewTxSimulator("test_tx_1")
@@ -116,7 +116,7 @@ func TestStateListener(t *testing.T) {
 		t.Fatalf("Failed to create new Provider: %s", err)
 	}
 	defer provider.Close()
-	lgr, err = provider.Open(channelid)
+	lgr, err = provider.Open(channelid, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 	require.NoError(t, err)

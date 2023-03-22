@@ -69,7 +69,7 @@ func TestKVLedgerBlockStorage(t *testing.T) {
 
 		bg, gb := testutil.NewBlockGenerator(t, "testLedger", false)
 		gbHash := protoutil.BlockHeaderHash(gb.Header)
-		lgr, err := provider.CreateFromGenesisBlock(gb)
+		lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 		require.NoError(t, err)
 		defer lgr.Close()
 
@@ -165,7 +165,7 @@ func TestKVLedgerBlockStorage(t *testing.T) {
 		defer provider.Close()
 
 		_, gb := testutil.NewBlockGenerator(t, "testLedger", false)
-		lgr, err := provider.CreateFromGenesisBlock(gb)
+		lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 		require.NoError(t, err)
 		defer lgr.Close()
 
@@ -183,7 +183,7 @@ func TestAddCommitHash(t *testing.T) {
 
 	bg, gb := testutil.NewBlockGenerator(t, "testLedger", false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	lgr, err := provider.CreateFromGenesisBlock(gb)
+	lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 
@@ -235,7 +235,7 @@ func TestKVLedgerBlockStorageWithPvtdata(t *testing.T) {
 
 	bg, gb := testutil.NewBlockGenerator(t, "testLedger", false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	lgr, err := provider.CreateFromGenesisBlock(gb)
+	lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 
@@ -310,7 +310,7 @@ func TestKVLedgerDBRecovery(t *testing.T) {
 
 	testLedgerid := "testLedger"
 	bg, gb := testutil.NewBlockGenerator(t, testLedgerid, false)
-	ledger1, err := provider1.CreateFromGenesisBlock(gb)
+	ledger1, err := provider1.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer ledger1.Close()
 
@@ -378,7 +378,7 @@ func TestKVLedgerDBRecovery(t *testing.T) {
 		conf,
 	)
 	defer provider2.Close()
-	ledger2, err := provider2.Open(testLedgerid)
+	ledger2, err := provider2.Open(testLedgerid, nil)
 	require.NoError(t, err)
 	defer ledger2.Close()
 	checkBCSummaryForTest(t, ledger2,
@@ -436,7 +436,7 @@ func TestKVLedgerDBRecovery(t *testing.T) {
 		conf,
 	)
 	defer provider3.Close()
-	ledger3, err := provider3.Open(testLedgerid)
+	ledger3, err := provider3.Open(testLedgerid, nil)
 	require.NoError(t, err)
 	defer ledger3.Close()
 
@@ -495,7 +495,7 @@ func TestKVLedgerDBRecovery(t *testing.T) {
 		conf,
 	)
 	defer provider4.Close()
-	ledger4, err := provider4.Open(testLedgerid)
+	ledger4, err := provider4.Open(testLedgerid, nil)
 	require.NoError(t, err)
 	defer ledger4.Close()
 	checkBCSummaryForTest(t, ledger4,
@@ -517,7 +517,7 @@ func TestLedgerWithCouchDbEnabledWithBinaryAndJSONData(t *testing.T) {
 	defer provider.Close()
 	bg, gb := testutil.NewBlockGenerator(t, "testLedger", false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	lgr, err := provider.CreateFromGenesisBlock(gb)
+	lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 
@@ -630,7 +630,7 @@ func TestPvtDataAPIs(t *testing.T) {
 	ledgerID := "testLedger"
 	bg, gb := testutil.NewBlockGenerator(t, ledgerID, false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	lgr, err := provider.CreateFromGenesisBlock(gb)
+	lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 	lgr.(*kvLedger).pvtdataStore.Init(btlPolicyForSampleData())
@@ -717,7 +717,7 @@ func TestCrashAfterPvtdataStoreCommit(t *testing.T) {
 	ledgerID := "testLedger"
 	bg, gb := testutil.NewBlockGenerator(t, ledgerID, false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	lgr, err := provider.CreateFromGenesisBlock(gb)
+	lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 
@@ -748,7 +748,7 @@ func TestCrashAfterPvtdataStoreCommit(t *testing.T) {
 	// mimic peer restart
 	provider1 := testutilNewProvider(conf, t, ccInfoProvider)
 	defer provider1.Close()
-	lgr1, err := provider1.Open(ledgerID)
+	lgr1, err := provider1.Open(ledgerID, nil)
 	require.NoError(t, err)
 	defer lgr1.Close()
 
@@ -817,7 +817,7 @@ func TestPvtStoreAheadOfBlockStore(t *testing.T) {
 	ledgerID := "testLedger"
 	bg, gb := testutil.NewBlockGenerator(t, ledgerID, false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	lgr, err := provider.CreateFromGenesisBlock(gb)
+	lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 
@@ -847,7 +847,7 @@ func TestPvtStoreAheadOfBlockStore(t *testing.T) {
 
 	provider1 := testutilNewProvider(conf, t, ccInfoProvider)
 	defer provider1.Close()
-	lgr1, err := provider1.Open(ledgerID)
+	lgr1, err := provider1.Open(ledgerID, nil)
 	require.NoError(t, err)
 	defer lgr1.Close()
 	kvlgr = lgr1.(*kvLedger)
@@ -876,7 +876,7 @@ func TestPvtStoreAheadOfBlockStore(t *testing.T) {
 
 	provider2 := testutilNewProvider(conf, t, &mock.DeployedChaincodeInfoProvider{})
 	defer provider2.Close()
-	lgr2, err := provider2.Open(ledgerID)
+	lgr2, err := provider2.Open(ledgerID, nil)
 	require.NoError(t, err)
 	defer lgr2.Close()
 	kvlgr = lgr2.(*kvLedger)
@@ -915,7 +915,7 @@ func TestCommitToPvtAndBlockstoreError(t *testing.T) {
 	ledgerID := "testLedger"
 	bg, gb := testutil.NewBlockGenerator(t, ledgerID, false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	lgr1, err := provider1.CreateFromGenesisBlock(gb)
+	lgr1, err := provider1.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer lgr1.Close()
 
@@ -963,7 +963,7 @@ func TestCollectionConfigHistoryRetriever(t *testing.T) {
 		provider = testutilNewProvider(conf, t, mockDeployedCCInfoProvider)
 		ledgerID := "testLedger"
 		_, gb := testutil.NewBlockGenerator(t, ledgerID, false)
-		lgr, err = provider.CreateFromGenesisBlock(gb)
+		lgr, err = provider.CreateFromGenesisBlock(gb, nil)
 		require.NoError(t, err)
 		cleanup = func() {
 			lgr.Close()
@@ -1222,7 +1222,7 @@ func TestCommitNotificationsOnBlockCommit(t *testing.T) {
 	defer provider.Close()
 
 	_, gb := testutil.NewBlockGenerator(t, "testLedger", false)
-	l, err := provider.CreateFromGenesisBlock(gb)
+	l, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer l.Close()
 

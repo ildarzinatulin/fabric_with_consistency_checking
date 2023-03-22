@@ -39,6 +39,8 @@ import (
 	mspmgmt "github.com/hyperledger/fabric/msp/mgmt"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
+	"github.com/vldmkr/merkle-patricia-trie/storage"
 )
 
 var peerLogger = flogging.MustGetLogger("peer")
@@ -188,12 +190,17 @@ func (p *Peer) CreateChannel(
 	legacyLifecycleValidation plugindispatcher.LifecycleResources,
 	newLifecycleValidation plugindispatcher.CollectionAndLifecycleResources,
 ) error {
-	l, err := p.LedgerMgr.CreateLedger(cid, cb)
+	trieBundle, err := p.InitStateTrie(cid)
+	if err != nil {
+		peerLogger.Errorf("Failed to init state trie for ledger %s(%+v)", cid, err)
+		return err
+	}
+	l, err := p.LedgerMgr.CreateLedger(cid, cb, trieBundle.trie)
 	if err != nil {
 		return errors.WithMessage(err, "cannot create ledger from genesis block")
 	}
 
-	if err := p.createChannel(cid, l, deployedCCInfoProvider, legacyLifecycleValidation, newLifecycleValidation); err != nil {
+	if err := p.createChannel(cid, l, deployedCCInfoProvider, legacyLifecycleValidation, newLifecycleValidation, trieBundle); err != nil {
 		return err
 	}
 
@@ -209,7 +216,7 @@ func (p *Peer) CreateChannelFromSnapshot(
 	newLifecycleValidation plugindispatcher.CollectionAndLifecycleResources,
 ) error {
 	channelCallback := func(l ledger.PeerLedger, cid string) {
-		if err := p.createChannel(cid, l, deployedCCInfoProvider, legacyLifecycleValidation, newLifecycleValidation); err != nil {
+		if err := p.createChannel(cid, l, deployedCCInfoProvider, legacyLifecycleValidation, newLifecycleValidation, TrieBundle{}); err != nil {
 			logger.Errorf("error creating channel for %s", cid)
 			return
 		}
@@ -241,6 +248,7 @@ func (p *Peer) createChannel(
 	deployedCCInfoProvider ledger.DeployedChaincodeInfoProvider,
 	legacyLifecycleValidation plugindispatcher.LifecycleResources,
 	newLifecycleValidation plugindispatcher.CollectionAndLifecycleResources,
+	stateTrieBundle TrieBundle,
 ) error {
 	chanConf, err := RetrievePersistedChannelConfig(l)
 	if err != nil {
@@ -355,6 +363,7 @@ func (p *Peer) createChannel(
 			p.pluginMapper,
 			policies.PolicyManagerGetterFunc(p.GetPolicyManager),
 			p.CryptoProvider,
+			stateTrieBundle.storage,
 		),
 	}
 
@@ -375,6 +384,7 @@ func (p *Peer) createChannel(
 		CollectionStore:      simpleCollectionStore,
 		IdDeserializeFactory: idDeserializerFactory,
 		CapabilityProvider:   channel,
+		StateTrie:            stateTrieBundle.trie,
 	})
 
 	p.mutex.Lock()
@@ -509,14 +519,20 @@ func (p *Peer) Initialize(
 
 	for _, cid := range ledgerIds {
 		peerLogger.Infof("Loading chain %s", cid)
-		ledger, err := p.LedgerMgr.OpenLedger(cid)
+		trieBundle, err := p.InitStateTrie(cid)
+		if err != nil {
+			peerLogger.Errorf("Failed to init state trie for ledger %s(%+v)", cid, err)
+			continue
+		}
+
+		ledger, err := p.LedgerMgr.OpenLedger(cid, trieBundle.trie)
 		if err != nil {
 			peerLogger.Errorf("Failed to load ledger %s(%+v)", cid, err)
 			peerLogger.Debugf("Error while loading ledger %s with message %s. We continue to the next ledger rather than abort.", cid, err)
 			continue
 		}
 		// Create a chain if we get a valid ledger with config block
-		err = p.createChannel(cid, ledger, deployedCCInfoProvider, legacyLifecycleValidation, newLifecycleValidation)
+		err = p.createChannel(cid, ledger, deployedCCInfoProvider, legacyLifecycleValidation, newLifecycleValidation, trieBundle)
 		if err != nil {
 			peerLogger.Errorf("Failed to load chain %s(%s)", cid, err)
 			peerLogger.Debugf("Error reloading chain %s with message %s. We continue to the next chain rather than abort.", cid, err)
@@ -529,4 +545,25 @@ func (p *Peer) Initialize(
 
 func (flbs fileLedgerBlockStore) RetrieveBlockByNumber(blockNum uint64) (*common.Block, error) {
 	return flbs.GetBlockByNumber(blockNum)
+}
+
+// TrieBundle TODO: move in a separate package
+type TrieBundle struct {
+	trie    *mpt.Trie
+	storage *storage.LevelDBAdapter
+}
+
+// InitStateTrie TODO: may be it is better to init trie while ledger initialization?
+func (p *Peer) InitStateTrie(ledgerId string) (TrieBundle, error) {
+	trieStorage, err := storage.NewLevelDBAdapter("/mptDB/peer/" + ledgerId)
+	if err != nil {
+		logger.Errorf("Error while init level db in /mptDB/peer/%s: %s", ledgerId, err)
+		return TrieBundle{}, err
+	}
+
+	// TODO: what if it's a new peer in a system?
+	return TrieBundle{
+		trie:    mpt.New(nil, trieStorage),
+		storage: trieStorage,
+	}, nil
 }

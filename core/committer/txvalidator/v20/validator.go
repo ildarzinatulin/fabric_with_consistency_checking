@@ -28,6 +28,7 @@ import (
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/storage"
 )
 
 // Semaphore provides to the validator means for synchronisation
@@ -111,6 +112,7 @@ type TxValidator struct {
 	LedgerResources  LedgerResources
 	Dispatcher       Dispatcher
 	CryptoProvider   bccsp.BCCSP
+	StateTrieStorage *storage.LevelDBAdapter // TODO may be it's better to make а manager for checking head existing
 }
 
 var logger = flogging.MustGetLogger("committer.txvalidator")
@@ -139,6 +141,7 @@ func NewTxValidator(
 	pm plugin.Mapper,
 	channelPolicyManagerGetter policies.ChannelPolicyManagerGetter,
 	cryptoProvider bccsp.BCCSP,
+	stateTrieStorage *storage.LevelDBAdapter,
 ) *TxValidator {
 	// Encapsulates interface implementation
 	pluginValidator := plugindispatcher.NewPluginValidator(pm, ler, &dynamicDeserializer{cr: cr}, &dynamicCapabilities{cr: cr}, channelPolicyManagerGetter, cor)
@@ -149,6 +152,7 @@ func NewTxValidator(
 		LedgerResources:  ler,
 		Dispatcher:       plugindispatcher.New(channelID, cr, ler, lcr, pluginValidator),
 		CryptoProvider:   cryptoProvider,
+		StateTrieStorage: stateTrieStorage,
 	}
 }
 
@@ -178,8 +182,6 @@ func (v *TxValidator) chainExists(chain string) bool {
 //     guaranteed to be alone in the block. If/when this assumption
 //     is violated, this code must be changed.
 func (v *TxValidator) Validate(block *common.Block) error {
-	// todo в случае блока аттестации проверять mpt
-
 	var err error
 	var errPos int
 
@@ -419,6 +421,27 @@ func (v *TxValidator) validateTx(req *blockValidationRequest, results chan<- *bl
 				return
 			}
 			logger.Infow("Config transaction validated and applied to channel resources", "channel", channel)
+		} else if common.HeaderType(chdr.Type) == common.НeaderType_ATTESTATION_RESULT {
+			logger.Debug("Attestation transaction received")
+
+			if v.StateTrieStorage == nil {
+				return
+			}
+
+			attestationResult := &common.AttestationResult{}
+			err = proto.Unmarshal(payload.Data, attestationResult)
+			if err != nil {
+				logger.Criticalf("Error while unmarshaling attestation result message for channel %s, error: %s", v.ChannelID, err)
+				return
+			}
+
+			if v.StateTrieStorage.Has(attestationResult.ChosenTrieHead) {
+				logger.Debugf("Successful validation of an attestation result")
+			} else {
+				logger.Criticalf("There is no trie head for block number: %d channel: %s", attestationResult.BlockNumber, v.ChannelID)
+			}
+			return
+
 		} else {
 			logger.Warningf("Unknown transaction type [%s] in block number [%d] transaction index [%d]",
 				common.HeaderType(chdr.Type), block.Header.Number, tIdx)

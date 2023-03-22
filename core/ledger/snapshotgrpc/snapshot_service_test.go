@@ -40,7 +40,7 @@ func TestSnapshot(t *testing.T) {
 	ledgerMgr := ledgermgmt.NewLedgerMgr(ledgermgmtInitializer)
 	gb, err := test.MakeGenesisBlock(ledgerID)
 	require.NoError(t, err)
-	lgr, err := ledgerMgr.CreateLedger(ledgerID, gb)
+	lgr, err := ledgerMgr.CreateLedger(ledgerID, gb, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 

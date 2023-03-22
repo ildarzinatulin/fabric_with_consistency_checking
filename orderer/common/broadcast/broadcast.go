@@ -8,7 +8,6 @@ package broadcast
 
 import (
 	"io"
-	"strings"
 	"time"
 
 	cb "github.com/hyperledger/fabric-protos-go/common"
@@ -16,9 +15,7 @@ import (
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/orderer/common/msgprocessor"
-	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 var logger = flogging.MustGetLogger("orderer.common.broadcast")
@@ -51,6 +48,8 @@ type Consenter interface {
 	// It ultimately passes through to the consensus.Chain interface
 	Configure(config *cb.Envelope, configSeq uint64) error
 
+	SendAttestationResult(attestationResult *cb.Envelope, configSeq uint64) error
+
 	// WaitReady blocks waiting for consenter to be ready for accepting new messages.
 	// This is useful when consenter needs to temporarily block ingress messages so
 	// that in-flight messages can be consumed. It could return error if consenter is
@@ -61,9 +60,8 @@ type Consenter interface {
 
 // Handler is designed to handle connections from Broadcast AB gRPC service
 type Handler struct {
-	SupportRegistrar           ChannelSupportRegistrar
-	Metrics                    *Metrics
-	AttestationMessagesStorage *leveldb.DB // todo переделать в manager
+	SupportRegistrar ChannelSupportRegistrar
+	Metrics          *Metrics
 }
 
 // Handle reads requests from a Broadcast stream, processes them, and returns the responses to the stream
@@ -163,44 +161,25 @@ func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.Broad
 	if chdr.Type == int32(cb.НeaderType_ATTESTATION) {
 		logger.Debugf("[channel: %s] Broadcast is processing attestation message from %s", chdr.ChannelId, addr)
 
-		message := &cb.ConfigValue{}
-		_, err = protoutil.UnmarshalEnvelopeOfType(msg, cb.НeaderType_ATTESTATION, message)
-		if err != nil {
-			logger.Warningf("[channel: %s] Rejecting broadcast of message from %s with BAD_REQUEST: error while unmarshaling message: %s", chdr.ChannelId, addr, err)
-			return &ab.BroadcastResponse{Status: cb.Status_BAD_REQUEST, Info: err.Error()}
-		}
+		attestationResult, configSeq, err := processor.ProcessAttestationMsg(msg)
 
-		key := []byte(chdr.ChannelId)
-		key = append(key, []byte("#")...)
-		key = append(key, byte(message.Version))
-
-		var messages []byte
-		hasMessages, err := bh.AttestationMessagesStorage.Has(key, nil)
 		if err != nil {
-			logger.Warningf("[channel: %s] Rejecting broadcast of message from %s with BAD_REQUEST: error while getting exist messages: %s", chdr.ChannelId, addr, err)
-			return &ab.BroadcastResponse{Status: cb.Status_SERVICE_UNAVAILABLE, Info: err.Error()}
+			logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s because of error: %s", chdr.ChannelId, addr, err)
+			return &ab.BroadcastResponse{Status: ClassifyError(err), Info: err.Error()}
 		}
-		if hasMessages {
-			messages, err = bh.AttestationMessagesStorage.Get(key, nil)
-			if err != nil {
-				logger.Warningf("[channel: %s] Rejecting broadcast of message from %s with BAD_REQUEST: error while getting exist messages: %s", chdr.ChannelId, addr, err)
+		if attestationResult != nil {
+			tracker.EndValidate()
+
+			tracker.BeginEnqueue()
+			if err = processor.WaitReady(); err != nil {
+				logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s with SERVICE_UNAVAILABLE: rejected by Consenter: %s", chdr.ChannelId, addr, err)
 				return &ab.BroadcastResponse{Status: cb.Status_SERVICE_UNAVAILABLE, Info: err.Error()}
 			}
-			messages = append(messages, []byte("#")...)
-		}
 
-		messages = append(messages, message.Value...)
-		err = bh.AttestationMessagesStorage.Put(key, messages, nil)
-		if err != nil {
-			logger.Warningf("[channel: %s] Rejecting broadcast of message from %s with BAD_REQUEST: error while saving message: %s", chdr.ChannelId, addr, err)
-			return &ab.BroadcastResponse{Status: cb.Status_SERVICE_UNAVAILABLE, Info: err.Error()}
-		}
-
-		if hasMessages {
-			m := strings.Split(string(messages), "#")
-			if len(m) > 2 { //todo len(m) > n, где n <= количество peer’ов
-				//todo искать root hash удовлетворяющий кворуму
-				//отправлять либо блок либо новый вид сообщений через деливери сервис
+			err = processor.SendAttestationResult(attestationResult, configSeq)
+			if err != nil {
+				logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s with SERVICE_UNAVAILABLE: rejected by Configure: %s", chdr.ChannelId, addr, err)
+				return &ab.BroadcastResponse{Status: cb.Status_SERVICE_UNAVAILABLE, Info: err.Error()}
 			}
 		}
 

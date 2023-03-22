@@ -7,16 +7,20 @@ SPDX-License-Identifier: Apache-2.0
 package msgprocessor
 
 import (
+	"strconv"
+	"strings"
+
+	"github.com/hyperledger/fabric-protos-go/common"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/policies"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
-	"github.com/hyperledger/fabric/protoutil"
-
 	"github.com/hyperledger/fabric/orderer/common/localconfig"
+	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 //go:generate counterfeiter -o mocks/signer_serializer.go --fake-name SignerSerializer . signerSerializer
@@ -45,17 +49,19 @@ type StandardChannelSupport interface {
 
 // StandardChannel implements the Processor interface for standard extant channels
 type StandardChannel struct {
-	support           StandardChannelSupport
-	filters           *RuleSet // Rules applicable to both normal and config messages
-	maintenanceFilter Rule     // Rule applicable only to config messages
+	support                    StandardChannelSupport
+	filters                    *RuleSet    // Rules applicable to both normal and config messages
+	maintenanceFilter          Rule        // Rule applicable only to config messages
+	attestationMessagesStorage *leveldb.DB // todo переделать в manager
 }
 
 // NewStandardChannel creates a new standard message processor
-func NewStandardChannel(support StandardChannelSupport, filters *RuleSet, bccsp bccsp.BCCSP) *StandardChannel {
+func NewStandardChannel(support StandardChannelSupport, filters *RuleSet, bccsp bccsp.BCCSP, attestationMessagesStorage *leveldb.DB) *StandardChannel {
 	return &StandardChannel{
-		filters:           filters,
-		support:           support,
-		maintenanceFilter: NewMaintenanceFilter(support, bccsp),
+		filters:                    filters,
+		support:                    support,
+		maintenanceFilter:          NewMaintenanceFilter(support, bccsp),
+		attestationMessagesStorage: attestationMessagesStorage,
 	}
 }
 
@@ -170,4 +176,99 @@ func (s *StandardChannel) ProcessConfigMsg(env *cb.Envelope) (config *cb.Envelop
 	}
 
 	return s.ProcessConfigUpdateMsg(configEnvelope.LastUpdate)
+}
+
+func (s *StandardChannel) ProcessAttestationMsg(env *cb.Envelope) (attestationResultEnv *cb.Envelope, configSeq uint64, err error) {
+	logger.Debugf("Processing attestation message for channel %s", s.support.ChannelID())
+
+	if s.attestationMessagesStorage == nil {
+		logger.Warning("attestation messages storage is not init")
+		return nil, 0, nil
+	}
+
+	message := &cb.Attestation{}
+	_, err = protoutil.UnmarshalEnvelopeOfType(env, cb.НeaderType_ATTESTATION, message)
+	if err != nil {
+		logger.Warningf("error while unmarshaling attestation message: %s", err)
+		return nil, 0, err
+	}
+
+	key := s.getKeyForAttestationMessage(message)
+
+	existMessages, err := s.getExistMessages(key)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = s.putNewMessage(existMessages, message, key)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	trieHeadCounter := s.countTrieHeads(existMessages)
+
+	for trieHead, counter := range trieHeadCounter {
+		if counter > s.getThresholdForAttestationResult() {
+			attestationResult := &cb.AttestationResult{
+				BlockNumber:    message.GetBlockNumber(),
+				ChosenTrieHead: []byte(trieHead),
+				// Proof: todo sending all exist attestation result messages with sign
+			}
+
+			attestationResultEnv, err = protoutil.CreateSignedEnvelope(cb.НeaderType_ATTESTATION_RESULT, s.support.ChannelID(), s.support.Signer(), attestationResult, 0, 0)
+			if err != nil {
+				logger.Errorf("Error while creating attestation result envelope %s", err)
+				return nil, 0, err
+			}
+			return attestationResultEnv, s.support.Sequence(), nil
+		}
+	}
+
+	return nil, 0, err
+}
+
+func (s *StandardChannel) getThresholdForAttestationResult() int {
+	return 2 // todo should be set by channel configuration
+}
+
+func (s *StandardChannel) countTrieHeads(existMessages []byte) map[string]int {
+	allMessages := strings.Split(string(existMessages), "#")
+	trieHeadCounter := make(map[string]int)
+	for _, trieHead := range allMessages {
+		trieHeadCounter[trieHead] += 1
+	}
+	return trieHeadCounter
+}
+
+func (s *StandardChannel) putNewMessage(existMessages []byte, newMessage *cb.Attestation, key []byte) error {
+	existMessages = append(existMessages, []byte("#")...)
+	existMessages = append(existMessages, newMessage.GetTrieHead()...)
+	err := s.attestationMessagesStorage.Put(key, existMessages, nil)
+	if err != nil {
+		logger.Warningf("error while saving message: %s", err)
+		return err
+	}
+	return nil
+}
+
+func (s *StandardChannel) getExistMessages(key []byte) ([]byte, error) {
+	hasMessages, err := s.attestationMessagesStorage.Has(key, nil)
+	if err != nil {
+		logger.Warningf("error while getting exist messages: %s", err)
+		return nil, err
+	}
+
+	var messages []byte
+	if hasMessages {
+		messages, err = s.attestationMessagesStorage.Get(key, nil)
+		if err != nil {
+			logger.Warningf("error while getting exist messages: %s", err)
+			return nil, err
+		}
+	}
+	return messages, nil
+}
+
+func (s *StandardChannel) getKeyForAttestationMessage(message *common.Attestation) []byte {
+	return []byte(strconv.FormatUint(message.GetBlockNumber(), 10))
 }

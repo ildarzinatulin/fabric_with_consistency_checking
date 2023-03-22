@@ -35,6 +35,7 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/txflags"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
 )
 
 var logger = flogging.MustGetLogger("kvledger")
@@ -87,6 +88,7 @@ type lgrInitializer struct {
 	customTxProcessors       map[common.HeaderType]ledger.CustomTxProcessor
 	hashProvider             ledger.HashProvider
 	config                   *ledger.Config
+	stateTrie                *mpt.Trie
 }
 
 func newKVLedger(initializer *lgrInitializer) (*kvLedger, error) {
@@ -125,6 +127,7 @@ func newKVLedger(initializer *lgrInitializer) (*kvLedger, error) {
 		CCInfoProvider:      initializer.ccInfoProvider,
 		CustomTxProcessors:  initializer.customTxProcessors,
 		HashFunc:            rwsetHashFunc,
+		StateTrie:           initializer.stateTrie,
 	}
 	if err := l.initTxMgr(txmgrInitializer); err != nil {
 		return nil, err

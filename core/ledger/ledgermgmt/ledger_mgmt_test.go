@@ -35,7 +35,7 @@ func TestLedgerMgmt(t *testing.T) {
 	for i := 0; i < numLedgers; i++ {
 		cid := constructTestLedgerID(i)
 		gb, _ := test.MakeGenesisBlock(cid)
-		l, err := ledgerMgr.CreateLedger(cid, gb)
+		l, err := ledgerMgr.CreateLedger(cid, gb, nil)
 		require.NoError(t, err)
 		ledgers[i] = l
 	}
@@ -48,7 +48,7 @@ func TestLedgerMgmt(t *testing.T) {
 
 	ledgerID := constructTestLedgerID(2)
 	t.Logf("Ledger selected for test = %s", ledgerID)
-	_, err := ledgerMgr.OpenLedger(ledgerID)
+	_, err := ledgerMgr.OpenLedger(ledgerID, nil)
 	require.Equal(t, ErrLedgerAlreadyOpened, err)
 
 	l := ledgers[2]
@@ -56,17 +56,17 @@ func TestLedgerMgmt(t *testing.T) {
 	// attempt to close the same ledger twice and ensure it doesn't panic
 	require.NotPanics(t, l.Close)
 
-	_, err = ledgerMgr.OpenLedger(ledgerID)
+	_, err = ledgerMgr.OpenLedger(ledgerID, nil)
 	require.NoError(t, err)
 
-	_, err = ledgerMgr.OpenLedger(ledgerID)
+	_, err = ledgerMgr.OpenLedger(ledgerID, nil)
 	require.Equal(t, ErrLedgerAlreadyOpened, err)
 	// close all opened ledgers and ledger mgmt
 	ledgerMgr.Close()
 
 	// Recreate LedgerMgr with existing ledgers
 	ledgerMgr = NewLedgerMgr(initializer)
-	_, err = ledgerMgr.OpenLedger(ledgerID)
+	_, err = ledgerMgr.OpenLedger(ledgerID, nil)
 	require.NoError(t, err)
 	ledgerMgr.Close()
 }
@@ -183,7 +183,7 @@ func TestConcurrentCreateLedgerFromGB(t *testing.T) {
 		gb := gbs[i]
 		ledgerID := fmt.Sprintf("l%d", i)
 		go func() {
-			_, err := ledgerMgr.CreateLedger(ledgerID, gb)
+			_, err := ledgerMgr.CreateLedger(ledgerID, gb, nil)
 			require.NoError(t, err)
 		}()
 	}
@@ -223,7 +223,7 @@ func TestConcurrentCreateLedgerFromSnapshot(t *testing.T) {
 	channelID3 := "ledgerfromgb"
 	gb, err := test.MakeGenesisBlock(channelID3)
 	require.NoError(t, err)
-	_, err = ledgerMgr2.CreateLedger(channelID3, gb)
+	_, err = ledgerMgr2.CreateLedger(channelID3, gb, nil)
 	require.EqualError(t, err, fmt.Sprintf("a ledger is being created from a snapshot at %s. Call ledger creation again after it is done.", snapshotDir1))
 
 	// concurrent CreateLedgerBySnapshot call should fail
@@ -242,7 +242,7 @@ func TestConcurrentCreateLedgerFromSnapshot(t *testing.T) {
 	require.Equal(t, ledgerIDs, []string{channelID1})
 
 	// CreateLedger should work after the previous CreateLedgerFromSnapshot is done
-	_, err = ledgerMgr2.CreateLedger(channelID3, gb)
+	_, err = ledgerMgr2.CreateLedger(channelID3, gb, nil)
 	require.NoError(t, err, "creating ledger for %s should have succeeded", channelID3)
 
 	// CreateLedgerFromSnapshot should work after the previous CreateLedgerFromSnapshot is done
@@ -266,7 +266,7 @@ func TestChaincodeInfoProvider(t *testing.T) {
 	defer cleanup()
 
 	gb, _ := test.MakeGenesisBlock("ledger1")
-	_, err := ledgerMgr.CreateLedger("ledger1", gb)
+	_, err := ledgerMgr.CreateLedger("ledger1", gb, nil)
 	require.NoError(t, err)
 
 	mockDeployedCCInfoProvider := &mock.DeployedChaincodeInfoProvider{}
@@ -357,7 +357,7 @@ func constructTestCCDef(ccName, version, hash string) *cceventmgmt.ChaincodeDefi
 // generateSnapshot creates a ledger with genesis block and generates a snapshot when the ledger only has genesisblock
 func generateSnapshot(t *testing.T, ledgerMgr *LedgerMgr, initializer *Initializer, channelID string) (string, *common.Block) {
 	_, gb := testutil.NewBlockGenerator(t, channelID, false)
-	l, err := ledgerMgr.CreateLedger(channelID, gb)
+	l, err := ledgerMgr.CreateLedger(channelID, gb, nil)
 	require.NoError(t, err)
 
 	require.NoError(t, l.SubmitSnapshotRequest(0))

@@ -87,6 +87,7 @@ type Initializer struct {
 	CCInfoProvider      ledger.DeployedChaincodeInfoProvider
 	CustomTxProcessors  map[common.HeaderType]ledger.CustomTxProcessor
 	HashFunc            rwsetutil.HashFunc
+	StateTrie           *mpt.Trie
 }
 
 // NewLockBasedTxMgr constructs a new instance of NewLockBasedTxMgr
@@ -99,31 +100,13 @@ func NewLockBasedTxMgr(initializer *Initializer) (*LockBasedTxMgr, error) {
 		return nil, err
 	}
 
-	mptStorage, err := storage.NewLevelDBAdapter("/mptDB/peer/" + initializer.LedgerID)
-	if err != nil {
-		logger.Errorf("Error while init level db in /mptDB/peer/%s: %s", initializer.LedgerID, err)
-	}
-
-	rootHash, err := mptStorage.Get([]byte(initializer.LedgerID))
-	var stateTrie *mpt.Trie
-	if rootHash != nil && err == nil {
-		hashNode := mpt.HashNode(rootHash)
-		stateTrie = mpt.New(&hashNode, mptStorage)
-	} else {
-		if err != nil {
-			logger.Infof("Error while getting root hash for ledger %s: %s", initializer.LedgerID, err)
-		}
-		stateTrie = mpt.New(nil, mptStorage)
-	}
-
 	txmgr := &LockBasedTxMgr{
 		ledgerid:       initializer.LedgerID,
 		db:             initializer.DB,
 		stateListeners: initializer.StateListeners,
 		ccInfoProvider: initializer.CCInfoProvider,
 		hashFunc:       initializer.HashFunc,
-		stateTrie:      stateTrie,
-		mptStorage:     mptStorage,
+		stateTrie:      initializer.StateTrie,
 	}
 	pvtstatePurgeMgr, err := pvtstatepurgemgmt.InstantiatePurgeMgr(
 		initializer.LedgerID,
@@ -568,7 +551,7 @@ func (txmgr *LockBasedTxMgr) Commit() error {
 		return err
 	}
 
-	err := txmgr.updateMPT()
+	err := txmgr.updateStateTrie()
 	if err != nil {
 		return err
 	}
@@ -590,8 +573,11 @@ func (txmgr *LockBasedTxMgr) Commit() error {
 	return nil
 }
 
-func (txmgr *LockBasedTxMgr) updateMPT() error {
-	//todo причесать
+func (txmgr *LockBasedTxMgr) updateStateTrie() error {
+	if txmgr.stateTrie == nil {
+		return nil
+	}
+
 	for ns, nsBatch := range txmgr.currentUpdates.batch.PvtUpdates.UpdateMap {
 		for _, coll := range nsBatch.GetCollectionNames() {
 			for key, vv := range nsBatch.GetUpdates(coll) {

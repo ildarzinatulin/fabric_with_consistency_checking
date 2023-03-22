@@ -44,7 +44,7 @@ func TestStatsBlockCommit(t *testing.T) {
 	// create a ledger
 	ledgerid := "ledger1"
 	_, gb := testutil.NewBlockGenerator(t, ledgerid, false)
-	l, err := provider.CreateFromGenesisBlock(gb)
+	l, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	ledger := l.(*kvLedger)
 	defer ledger.Close()

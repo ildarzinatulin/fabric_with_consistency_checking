@@ -38,7 +38,7 @@ func (env *env) createTestLedgerFromGenesisBlk(id string) *testLedger {
 	t := env.t
 	genesisBlk, err := constructTestGenesisBlock(id)
 	require.NoError(t, err)
-	lgr, err := env.ledgerMgr.CreateLedger(id, genesisBlk)
+	lgr, err := env.ledgerMgr.CreateLedger(id, genesisBlk, nil)
 	require.NoError(t, err)
 	return &testLedger{
 		client:    newClient(lgr, id, t),
@@ -90,7 +90,7 @@ func (env *env) createTestLedgerFromSnapshot(snapshotDir string) *testLedger {
 // openTestLedger opens an existing ledger and retruns a 'testhelper' for the ledger
 func (env *env) openTestLedger(id string) *testLedger {
 	t := env.t
-	lgr, err := env.ledgerMgr.OpenLedger(id)
+	lgr, err := env.ledgerMgr.OpenLedger(id, nil)
 	require.NoError(t, err)
 	return &testLedger{
 		client:    newClient(lgr, id, t),

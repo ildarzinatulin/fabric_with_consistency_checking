@@ -330,7 +330,8 @@ func (p *Provider) CreateFromSnapshot(snapshotDir string) (ledger.PeerLedger, st
 		logger.Debugw("Preparing history db", "ledgerID", ledgerID)
 	}
 
-	lgr, err := p.open(ledgerID, metadata, true)
+	// state trie can't be load from snapshot yet
+	lgr, err := p.open(ledgerID, metadata, true, nil)
 	if err != nil {
 		return nil, "", p.deleteUnderConstructionLedger(
 			lgr,
