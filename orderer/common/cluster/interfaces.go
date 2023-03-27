@@ -11,7 +11,7 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/orderer"
+	"github.com/ildarzinatulin/fabric-protos-go/orderer"
 )
 
 //go:generate mockery -dir . -name Communicator -case underscore -output ./mocks/

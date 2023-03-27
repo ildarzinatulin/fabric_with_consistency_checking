@@ -10,8 +10,6 @@ import (
 	"fmt"
 	"sync"
 
-	gproto "github.com/hyperledger/fabric-protos-go/gossip"
-	tspb "github.com/hyperledger/fabric-protos-go/transientstore"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/committer"
 	"github.com/hyperledger/fabric/core/committer/txvalidator"
@@ -36,6 +34,8 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/peer/blocksprovider"
 	"github.com/hyperledger/fabric/internal/pkg/peer/orderers"
 	"github.com/hyperledger/fabric/protoutil"
+	gproto "github.com/ildarzinatulin/fabric-protos-go/gossip"
+	tspb "github.com/ildarzinatulin/fabric-protos-go/transientstore"
 	"github.com/pkg/errors"
 	"github.com/vldmkr/merkle-patricia-trie/mpt"
 	"google.golang.org/grpc"

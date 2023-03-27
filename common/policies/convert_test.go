@@ -9,13 +9,13 @@ package policies_test
 import (
 	"testing"
 
-	cb "github.com/hyperledger/fabric-protos-go/common"
-	mb "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric/common/cauthdsl"
 	"github.com/hyperledger/fabric/common/policies"
 	"github.com/hyperledger/fabric/common/policydsl"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
+	cb "github.com/ildarzinatulin/fabric-protos-go/common"
+	mb "github.com/ildarzinatulin/fabric-protos-go/msp"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )

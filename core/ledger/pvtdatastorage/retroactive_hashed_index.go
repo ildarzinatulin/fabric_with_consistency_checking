@@ -9,11 +9,11 @@ package pvtdatastorage
 import (
 	"time"
 
-	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
 	"github.com/hyperledger/fabric/common/ledger/util/leveldbhelper"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	"github.com/hyperledger/fabric/core/ledger/util"
+	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset"
 	"github.com/pkg/errors"
 )
 

@@ -16,9 +16,6 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-protos-go/discovery"
-	"github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/configtx/test"
 	"github.com/hyperledger/fabric/discovery/support/config"
@@ -26,6 +23,9 @@ import (
 	"github.com/hyperledger/fabric/internal/configtxgen/encoder"
 	"github.com/hyperledger/fabric/internal/configtxgen/genesisconfig"
 	"github.com/hyperledger/fabric/protoutil"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
+	"github.com/ildarzinatulin/fabric-protos-go/discovery"
+	"github.com/ildarzinatulin/fabric-protos-go/msp"
 	"github.com/onsi/gomega/gexec"
 	"github.com/stretchr/testify/require"
 )

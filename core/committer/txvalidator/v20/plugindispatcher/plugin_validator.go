@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/hyperledger/fabric-protos-go/common"
 	ledger2 "github.com/hyperledger/fabric/common/ledger"
 	"github.com/hyperledger/fabric/common/policies"
 	txvalidatorplugin "github.com/hyperledger/fabric/core/committer/txvalidator/plugin"
@@ -23,6 +22,7 @@ import (
 	"github.com/hyperledger/fabric/core/policy"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/pkg/errors"
 )
 

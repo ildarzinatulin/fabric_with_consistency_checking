@@ -13,9 +13,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-protos-go/peer"
-	transientstore2 "github.com/hyperledger/fabric-protos-go/transientstore"
 	"github.com/hyperledger/fabric/bccsp/factory"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	"github.com/hyperledger/fabric/common/channelconfig"
@@ -44,6 +41,9 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/peer/orderers"
 	"github.com/hyperledger/fabric/msp/mgmt"
 	msptesttools "github.com/hyperledger/fabric/msp/mgmt/testtools"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	transientstore2 "github.com/ildarzinatulin/fabric-protos-go/transientstore"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 )

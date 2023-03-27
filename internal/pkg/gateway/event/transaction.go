@@ -8,8 +8,8 @@ package event
 import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	"github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
 )
 
 type Transaction struct {

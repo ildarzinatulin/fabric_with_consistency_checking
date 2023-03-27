@@ -9,10 +9,10 @@ package tx
 import (
 	"github.com/pkg/errors"
 
-	"github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/pkg/tx"
 	"github.com/hyperledger/fabric/protoutil"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
 )
 
 // ProcessorFactory maintains a mapping between transaction type and associate `ProcessorCreator`

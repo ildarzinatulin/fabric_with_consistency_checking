@@ -10,9 +10,6 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
-	cb "github.com/hyperledger/fabric-protos-go/common"
-	pb "github.com/hyperledger/fabric-protos-go/peer"
-	lb "github.com/hyperledger/fabric-protos-go/peer/lifecycle"
 	"github.com/hyperledger/fabric/common/chaincode"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle"
@@ -20,6 +17,9 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/persistence"
 	"github.com/hyperledger/fabric/core/container"
 	"github.com/hyperledger/fabric/protoutil"
+	cb "github.com/ildarzinatulin/fabric-protos-go/common"
+	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
+	lb "github.com/ildarzinatulin/fabric-protos-go/peer/lifecycle"
 	"github.com/pkg/errors"
 
 	. "github.com/onsi/ginkgo/v2"

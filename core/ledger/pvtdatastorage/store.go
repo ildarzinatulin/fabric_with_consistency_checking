@@ -13,8 +13,6 @@ import (
 
 	"github.com/bits-and-blooms/bitset"
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
-	"github.com/hyperledger/fabric-protos-go/ledger/rwset/kvrwset"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/ledger/util/leveldbhelper"
 	"github.com/hyperledger/fabric/core/ledger"
@@ -23,6 +21,8 @@ import (
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	"github.com/hyperledger/fabric/core/ledger/pvtdatapolicy"
 	"github.com/hyperledger/fabric/core/ledger/util"
+	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset"
+	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset/kvrwset"
 	"github.com/pkg/errors"
 )
 

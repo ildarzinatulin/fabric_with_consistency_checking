@@ -11,9 +11,6 @@ import (
 	"fmt"
 	"testing"
 
-	proto "github.com/hyperledger/fabric-protos-go/gossip"
-	"github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric-protos-go/transientstore"
 	"github.com/hyperledger/fabric/core/common/privdata"
 	"github.com/hyperledger/fabric/gossip/api"
 	gcommon "github.com/hyperledger/fabric/gossip/common"
@@ -25,6 +22,9 @@ import (
 	mocks2 "github.com/hyperledger/fabric/gossip/privdata/mocks"
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/protoutil"
+	proto "github.com/ildarzinatulin/fabric-protos-go/gossip"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	"github.com/ildarzinatulin/fabric-protos-go/transientstore"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )

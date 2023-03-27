@@ -13,7 +13,6 @@ import (
 	"testing"
 	"time"
 
-	proto "github.com/hyperledger/fabric-protos-go/gossip"
 	"github.com/hyperledger/fabric/gossip/api"
 	"github.com/hyperledger/fabric/gossip/comm"
 	"github.com/hyperledger/fabric/gossip/common"
@@ -23,6 +22,7 @@ import (
 	"github.com/hyperledger/fabric/gossip/identity"
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/gossip/util"
+	proto "github.com/ildarzinatulin/fabric-protos-go/gossip"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )

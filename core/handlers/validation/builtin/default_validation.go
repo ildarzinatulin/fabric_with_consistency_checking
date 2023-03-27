@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/hyperledger/fabric-protos-go/common"
 	commonerrors "github.com/hyperledger/fabric/common/errors"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/committer/txvalidator/v20/plugindispatcher"
@@ -22,6 +21,7 @@ import (
 	v12 "github.com/hyperledger/fabric/core/handlers/validation/builtin/v12"
 	v13 "github.com/hyperledger/fabric/core/handlers/validation/builtin/v13"
 	v20 "github.com/hyperledger/fabric/core/handlers/validation/builtin/v20"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/pkg/errors"
 )
 

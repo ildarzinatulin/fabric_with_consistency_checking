@@ -11,10 +11,6 @@ import (
 	"regexp"
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
-	"github.com/hyperledger/fabric-protos-go/common"
-	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
-	pb "github.com/hyperledger/fabric-protos-go/peer"
-	lb "github.com/hyperledger/fabric-protos-go/peer/lifecycle"
 	"github.com/hyperledger/fabric/common/cauthdsl"
 	"github.com/hyperledger/fabric/common/chaincode"
 	"github.com/hyperledger/fabric/common/channelconfig"
@@ -24,6 +20,10 @@ import (
 	"github.com/hyperledger/fabric/core/dispatcher"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/msp"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
+	mspprotos "github.com/ildarzinatulin/fabric-protos-go/msp"
+	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
+	lb "github.com/ildarzinatulin/fabric-protos-go/peer/lifecycle"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"

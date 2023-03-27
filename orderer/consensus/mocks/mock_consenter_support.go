@@ -4,13 +4,13 @@ package mocks
 import (
 	"sync"
 
-	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/orderer/common/blockcutter"
 	"github.com/hyperledger/fabric/orderer/common/msgprocessor"
 	"github.com/hyperledger/fabric/orderer/consensus"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/hyperledger/fabric-protos-go/common"
+	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 )
 
 type FakeConsenterSupport struct {

@@ -15,7 +15,6 @@ import (
 	"sync"
 	"time"
 
-	protosgossip "github.com/hyperledger/fabric-protos-go/gossip"
 	commonutil "github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/common/privdata"
 	"github.com/hyperledger/fabric/gossip/api"
@@ -28,6 +27,7 @@ import (
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/gossip/util"
 	"github.com/hyperledger/fabric/protoutil"
+	protosgossip "github.com/ildarzinatulin/fabric-protos-go/gossip"
 	"github.com/pkg/errors"
 	"go.uber.org/zap/zapcore"
 )

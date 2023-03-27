@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/internal/peer/common"
+	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/stretchr/testify/require"
 )
 

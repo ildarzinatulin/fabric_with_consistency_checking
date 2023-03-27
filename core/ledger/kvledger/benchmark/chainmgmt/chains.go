@@ -12,11 +12,11 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/common/configtx/test"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/ledgermgmt"
 	"github.com/hyperledger/fabric/core/ledger/ledgermgmt/ledgermgmttest"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
 )
 
 // ChainID is a type used for the ids for the chains for experiments

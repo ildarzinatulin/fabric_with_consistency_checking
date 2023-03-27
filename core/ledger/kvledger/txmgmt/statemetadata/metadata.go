@@ -8,7 +8,7 @@ package statemetadata
 
 import (
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/ledger/rwset/kvrwset"
+	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset/kvrwset"
 )
 
 // Serialize serializes metadata entries for storing in statedb

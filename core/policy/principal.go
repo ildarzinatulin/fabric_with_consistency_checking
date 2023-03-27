@@ -18,8 +18,8 @@ package policy
 
 import (
 	"github.com/golang/protobuf/proto"
-	protomsp "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric/msp"
+	protomsp "github.com/ildarzinatulin/fabric-protos-go/msp"
 	"github.com/pkg/errors"
 )
 

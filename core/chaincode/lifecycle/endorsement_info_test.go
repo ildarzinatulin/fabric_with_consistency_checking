@@ -9,10 +9,10 @@ package lifecycle_test
 import (
 	"fmt"
 
-	lb "github.com/hyperledger/fabric-protos-go/peer/lifecycle"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle/mock"
 	"github.com/hyperledger/fabric/core/scc"
+	lb "github.com/ildarzinatulin/fabric-protos-go/peer/lifecycle"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

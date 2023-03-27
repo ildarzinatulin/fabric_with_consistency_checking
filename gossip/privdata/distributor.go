@@ -15,10 +15,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	protosgossip "github.com/hyperledger/fabric-protos-go/gossip"
-	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
-	"github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric-protos-go/transientstore"
 	"github.com/hyperledger/fabric/core/common/privdata"
 	"github.com/hyperledger/fabric/gossip/api"
 	gossipCommon "github.com/hyperledger/fabric/gossip/common"
@@ -30,6 +26,10 @@ import (
 	"github.com/hyperledger/fabric/gossip/util"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
+	protosgossip "github.com/ildarzinatulin/fabric-protos-go/gossip"
+	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	"github.com/ildarzinatulin/fabric-protos-go/transientstore"
 	"github.com/pkg/errors"
 )
 

@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/common/ledger/blkstorage"
 	"github.com/hyperledger/fabric/common/metrics/disabled"
 	"github.com/hyperledger/fabric/core/ledger/kvledger"
@@ -22,6 +21,7 @@ import (
 	"github.com/hyperledger/fabric/internal/ledgerutil/jsonrw"
 	"github.com/hyperledger/fabric/internal/ledgerutil/models"
 	"github.com/hyperledger/fabric/protoutil"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
 
 	"github.com/pkg/errors"
 )

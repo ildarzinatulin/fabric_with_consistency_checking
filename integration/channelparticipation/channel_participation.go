@@ -15,8 +15,8 @@ import (
 	"net/http"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/integration/nwo"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
 	"github.com/onsi/gomega/types"

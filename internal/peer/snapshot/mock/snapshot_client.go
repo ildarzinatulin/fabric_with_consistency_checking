@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"google.golang.org/grpc"
 )
 

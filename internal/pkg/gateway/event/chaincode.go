@@ -6,7 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 package event
 
 import (
-	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
 )
 
 type ChaincodeEvent struct {

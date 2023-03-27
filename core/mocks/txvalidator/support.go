@@ -19,10 +19,10 @@ package support
 import (
 	"sync"
 
-	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/msp"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
 )
 
 type Support struct {

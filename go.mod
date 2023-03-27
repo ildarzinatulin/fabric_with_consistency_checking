@@ -45,10 +45,11 @@ require (
 )
 
 require (
-	github.com/hyperledger/fabric-protos-go v0.3.0
 	github.com/vldmkr/merkle-patricia-trie v0.0.0-20201020143350-4b38f8d01ce1
 	google.golang.org/protobuf v1.28.1
 )
+
+require github.com/hyperledger/fabric-protos-go v0.0.0-20220516090339-9685156fada6 // indirect
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
@@ -75,6 +76,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hyperledger/fabric-amcl v0.0.0-20210603140002-2670f91851c8 // indirect
+	github.com/ildarzinatulin/fabric-protos-go v0.0.0-20230327174047-d5f2b5b6b7d1
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
@@ -116,5 +118,3 @@ require (
 )
 
 replace github.com/cespare/xxhash/v2 => github.com/cespare/xxhash/v2 v2.1.2 // fix for Go 1.17 in github.com/prometheus/client_golang dependency without updating protobuf
-
-replace github.com/hyperledger/fabric-protos-go => github.com/ildarzinatulin/fabric-protos-go v0.0.0-20230102132907-ddba464f8319

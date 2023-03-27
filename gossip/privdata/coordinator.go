@@ -9,10 +9,6 @@ package privdata
 import (
 	"time"
 
-	cb "github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
-	"github.com/hyperledger/fabric-protos-go/peer"
-	protostransientstore "github.com/hyperledger/fabric-protos-go/transientstore"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/core/committer"
 	"github.com/hyperledger/fabric/core/committer/txvalidator"
@@ -25,6 +21,10 @@ import (
 	"github.com/hyperledger/fabric/gossip/util"
 	"github.com/hyperledger/fabric/internal/peer/common"
 	"github.com/hyperledger/fabric/protoutil"
+	cb "github.com/ildarzinatulin/fabric-protos-go/common"
+	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	protostransientstore "github.com/ildarzinatulin/fabric-protos-go/transientstore"
 	"github.com/pkg/errors"
 	"github.com/vldmkr/merkle-patricia-trie/mpt"
 )
@@ -262,7 +262,7 @@ func (c *coordinator) sendAttestationMessage(lastBlockNumber uint64) error {
 
 	trieHead := c.Support.Trie.RootHash()
 
-	env, err := protoutil.CreateSignedEnvelope(cb.НeaderType_ATTESTATION, c.ChainID, c.signer, &cb.Attestation{TrieHead: trieHead, BlockNumber: lastBlockNumber}, 0, 0)
+	env, err := protoutil.CreateSignedEnvelope(cb.HeaderType_ATTESTATION, c.ChainID, c.signer, &cb.AttestationEnvelope{TrieHead: trieHead, BlockNumber: lastBlockNumber}, 0, 0)
 	if err != nil {
 		c.logger.Errorf("Error while getting trie head %s", err)
 		return err

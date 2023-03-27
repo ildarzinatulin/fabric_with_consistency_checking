@@ -10,11 +10,11 @@ import (
 	"io"
 	"time"
 
-	cb "github.com/hyperledger/fabric-protos-go/common"
-	ab "github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/orderer/common/msgprocessor"
+	cb "github.com/ildarzinatulin/fabric-protos-go/common"
+	ab "github.com/ildarzinatulin/fabric-protos-go/orderer"
 	"github.com/pkg/errors"
 )
 
@@ -158,7 +158,7 @@ func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.Broad
 		return &ab.BroadcastResponse{Status: cb.Status_BAD_REQUEST, Info: err.Error()}
 	}
 
-	if chdr.Type == int32(cb.НeaderType_ATTESTATION) {
+	if chdr.Type == int32(cb.HeaderType_ATTESTATION) {
 		logger.Debugf("[channel: %s] Broadcast is processing attestation message from %s", chdr.ChannelId, addr)
 
 		attestationResult, configSeq, err := processor.ProcessAttestationMsg(msg)

@@ -14,11 +14,11 @@ import (
 	"syscall"
 
 	docker "github.com/fsouza/go-dockerclient"
-	ab "github.com/hyperledger/fabric-protos-go/orderer"
-	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/integration/nwo"
 	"github.com/hyperledger/fabric/integration/nwo/commands"
 	"github.com/hyperledger/fabric/protoutil"
+	ab "github.com/ildarzinatulin/fabric-protos-go/orderer"
+	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"

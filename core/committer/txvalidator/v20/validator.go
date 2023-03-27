@@ -11,9 +11,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/common"
-	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
-	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/configtx"
@@ -27,6 +24,9 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/txflags"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
+	mspprotos "github.com/ildarzinatulin/fabric-protos-go/msp"
+	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 	"github.com/vldmkr/merkle-patricia-trie/storage"
 )
@@ -421,14 +421,14 @@ func (v *TxValidator) validateTx(req *blockValidationRequest, results chan<- *bl
 				return
 			}
 			logger.Infow("Config transaction validated and applied to channel resources", "channel", channel)
-		} else if common.HeaderType(chdr.Type) == common.НeaderType_ATTESTATION_RESULT {
+		} else if common.HeaderType(chdr.Type) == common.HeaderType_ATTESTATION_RESULT {
 			logger.Debug("Attestation transaction received")
 
 			if v.StateTrieStorage == nil {
 				return
 			}
 
-			attestationResult := &common.AttestationResult{}
+			attestationResult := &common.AttestationResultEnvelope{}
 			err = proto.Unmarshal(payload.Data, attestationResult)
 			if err != nil {
 				logger.Criticalf("Error while unmarshaling attestation result message for channel %s, error: %s", v.ChannelID, err)

@@ -10,15 +10,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hyperledger/fabric-protos-go/common"
-	cb "github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/policies"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
 	"github.com/hyperledger/fabric/orderer/common/localconfig"
 	"github.com/hyperledger/fabric/protoutil"
+	"github.com/ildarzinatulin/fabric-protos-go/common"
+	cb "github.com/ildarzinatulin/fabric-protos-go/common"
+	"github.com/ildarzinatulin/fabric-protos-go/orderer"
 	"github.com/pkg/errors"
 	"github.com/syndtr/goleveldb/leveldb"
 )
@@ -96,7 +96,7 @@ func (s *StandardChannel) ClassifyMsg(chdr *cb.ChannelHeader) Classification {
 	case int32(cb.HeaderType_CONFIG):
 		// In order to maintain backwards compatibility, we must classify these messages
 		return ConfigMsg
-	case int32(cb.НeaderType_ATTESTATION):
+	case int32(cb.HeaderType_ATTESTATION):
 		return AttestationMsg
 	default:
 		return NormalMsg
@@ -186,8 +186,8 @@ func (s *StandardChannel) ProcessAttestationMsg(env *cb.Envelope) (attestationRe
 		return nil, 0, nil
 	}
 
-	message := &cb.Attestation{}
-	_, err = protoutil.UnmarshalEnvelopeOfType(env, cb.НeaderType_ATTESTATION, message)
+	message := &cb.AttestationEnvelope{}
+	_, err = protoutil.UnmarshalEnvelopeOfType(env, cb.HeaderType_ATTESTATION, message)
 	if err != nil {
 		logger.Warningf("error while unmarshaling attestation message: %s", err)
 		return nil, 0, err
@@ -209,13 +209,13 @@ func (s *StandardChannel) ProcessAttestationMsg(env *cb.Envelope) (attestationRe
 
 	for trieHead, counter := range trieHeadCounter {
 		if counter > s.getThresholdForAttestationResult() {
-			attestationResult := &cb.AttestationResult{
+			attestationResult := &cb.AttestationResultEnvelope{
 				BlockNumber:    message.GetBlockNumber(),
 				ChosenTrieHead: []byte(trieHead),
 				// Proof: todo sending all exist attestation result messages with sign
 			}
 
-			attestationResultEnv, err = protoutil.CreateSignedEnvelope(cb.НeaderType_ATTESTATION_RESULT, s.support.ChannelID(), s.support.Signer(), attestationResult, 0, 0)
+			attestationResultEnv, err = protoutil.CreateSignedEnvelope(cb.HeaderType_ATTESTATION_RESULT, s.support.ChannelID(), s.support.Signer(), attestationResult, 0, 0)
 			if err != nil {
 				logger.Errorf("Error while creating attestation result envelope %s", err)
 				return nil, 0, err
@@ -240,7 +240,7 @@ func (s *StandardChannel) countTrieHeads(existMessages []byte) map[string]int {
 	return trieHeadCounter
 }
 
-func (s *StandardChannel) putNewMessage(existMessages []byte, newMessage *cb.Attestation, key []byte) error {
+func (s *StandardChannel) putNewMessage(existMessages []byte, newMessage *cb.AttestationEnvelope, key []byte) error {
 	existMessages = append(existMessages, []byte("#")...)
 	existMessages = append(existMessages, newMessage.GetTrieHead()...)
 	err := s.attestationMessagesStorage.Put(key, existMessages, nil)
@@ -269,6 +269,6 @@ func (s *StandardChannel) getExistMessages(key []byte) ([]byte, error) {
 	return messages, nil
 }
 
-func (s *StandardChannel) getKeyForAttestationMessage(message *common.Attestation) []byte {
+func (s *StandardChannel) getKeyForAttestationMessage(message *common.AttestationEnvelope) []byte {
 	return []byte(strconv.FormatUint(message.GetBlockNumber(), 10))
 }

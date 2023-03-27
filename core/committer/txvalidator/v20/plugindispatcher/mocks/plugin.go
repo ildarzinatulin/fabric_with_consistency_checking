@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	common "github.com/hyperledger/fabric-protos-go/common"
+	common "github.com/ildarzinatulin/fabric-protos-go/common"
 	mock "github.com/stretchr/testify/mock"
 
 	validation "github.com/hyperledger/fabric/core/handlers/validation/api"
