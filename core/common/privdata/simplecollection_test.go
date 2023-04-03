@@ -12,12 +12,12 @@ import (
 	"testing"
 	"time"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	mb "github.com/hyperledger/fabric-protos-go/msp"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/policydsl"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	mb "github.com/ildarzinatulin/fabric-protos-go/msp"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 )
 

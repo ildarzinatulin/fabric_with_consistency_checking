@@ -17,6 +17,8 @@ import (
 	"time"
 
 	gproto "github.com/golang/protobuf/proto"
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	proto "github.com/hyperledger/fabric-protos-go/gossip"
 	"github.com/hyperledger/fabric/bccsp/factory"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/metrics/disabled"
@@ -28,8 +30,6 @@ import (
 	"github.com/hyperledger/fabric/gossip/metrics/mocks"
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/gossip/util"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	proto "github.com/ildarzinatulin/fabric-protos-go/gossip"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

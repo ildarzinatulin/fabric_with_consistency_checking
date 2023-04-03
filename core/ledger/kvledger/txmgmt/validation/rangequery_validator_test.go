@@ -9,11 +9,11 @@ package validation
 import (
 	"testing"
 
+	"github.com/hyperledger/fabric-protos-go/ledger/rwset/kvrwset"
 	"github.com/hyperledger/fabric/core/ledger/internal/version"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/statedb"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/statedb/stateleveldb"
-	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset/kvrwset"
 	"github.com/stretchr/testify/require"
 )
 

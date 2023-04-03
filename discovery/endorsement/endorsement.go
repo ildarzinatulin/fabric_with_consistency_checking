@@ -9,8 +9,10 @@ package endorsement
 import (
 	"fmt"
 
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go/peer"
 
+	"github.com/hyperledger/fabric-protos-go/discovery"
+	"github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric/common/chaincode"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/graph"
@@ -19,8 +21,6 @@ import (
 	"github.com/hyperledger/fabric/gossip/api"
 	"github.com/hyperledger/fabric/gossip/common"
 	gossipdiscovery "github.com/hyperledger/fabric/gossip/discovery"
-	"github.com/ildarzinatulin/fabric-protos-go/discovery"
-	"github.com/ildarzinatulin/fabric-protos-go/msp"
 	"github.com/pkg/errors"
 )
 

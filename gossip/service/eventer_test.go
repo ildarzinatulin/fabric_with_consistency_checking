@@ -9,9 +9,9 @@ package service
 import (
 	"testing"
 
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/gossip/util"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 )
 

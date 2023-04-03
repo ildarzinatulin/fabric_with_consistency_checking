@@ -11,10 +11,10 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/common/policies"
 	"github.com/hyperledger/fabric/common/policydsl"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/stretchr/testify/require"
 )
 

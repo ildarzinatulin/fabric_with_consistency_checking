@@ -12,10 +12,10 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	pcommon "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	"github.com/hyperledger/fabric/internal/peer/common"
-	pcommon "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/stretchr/testify/require"
 )
 

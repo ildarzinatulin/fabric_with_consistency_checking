@@ -15,6 +15,9 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	configtxtest "github.com/hyperledger/fabric/common/configtx/test"
 	"github.com/hyperledger/fabric/common/ledger/blkstorage"
@@ -27,9 +30,6 @@ import (
 	"github.com/hyperledger/fabric/core/ledger/kvledger/msgs"
 	"github.com/hyperledger/fabric/core/ledger/mock"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/ledger/queryresult"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 )
 

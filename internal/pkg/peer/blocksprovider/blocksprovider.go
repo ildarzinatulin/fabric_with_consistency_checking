@@ -11,14 +11,14 @@ import (
 	"math"
 	"time"
 
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/gossip"
+	"github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/common/flogging"
 	gossipcommon "github.com/hyperledger/fabric/gossip/common"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
 	"github.com/hyperledger/fabric/internal/pkg/peer/orderers"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/gossip"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"

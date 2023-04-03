@@ -14,10 +14,10 @@ import (
 	"testing"
 	"time"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/gossip/api"
 	"github.com/hyperledger/fabric/gossip/common"
 	"github.com/hyperledger/fabric/gossip/util"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )

@@ -12,12 +12,12 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	"github.com/hyperledger/fabric-protos-go/discovery"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/discovery/protoext"
 	common2 "github.com/hyperledger/fabric/gossip/common"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/discovery"
 	"github.com/pkg/errors"
 )
 

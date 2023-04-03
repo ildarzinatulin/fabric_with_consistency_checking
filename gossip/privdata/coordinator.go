@@ -9,6 +9,10 @@ package privdata
 import (
 	"time"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
+	"github.com/hyperledger/fabric-protos-go/peer"
+	protostransientstore "github.com/hyperledger/fabric-protos-go/transientstore"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/core/committer"
 	"github.com/hyperledger/fabric/core/committer/txvalidator"
@@ -21,10 +25,6 @@ import (
 	"github.com/hyperledger/fabric/gossip/util"
 	"github.com/hyperledger/fabric/internal/peer/common"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
-	protostransientstore "github.com/ildarzinatulin/fabric-protos-go/transientstore"
 	"github.com/pkg/errors"
 	"github.com/vldmkr/merkle-patricia-trie/mpt"
 )

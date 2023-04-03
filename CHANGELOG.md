@@ -508,7 +508,7 @@ Early Hyperledger Fabric releases prior to v2.0 copied commit history into the c
 * [1333a39](https://github.com/hyperledger/fabric/commit/1333a39) Remove core/chaincode/shim from fabric
 * [50bedde](https://github.com/hyperledger/fabric/commit/50bedde) [FAB-16437](https://jira.hyperledger.org/browse/FAB-16437) Remove common/mocks from orderer
 * [c0261a7](https://github.com/hyperledger/fabric/commit/c0261a7) [FAB-16437](https://jira.hyperledger.org/browse/FAB-16437) Remove common/mocks from msgprocessor
-* [957e218](https://github.com/hyperledger/fabric/commit/957e218) Move to ildarzinatulin/fabric-protos-go
+* [957e218](https://github.com/hyperledger/fabric/commit/957e218) Move to hyperledger/fabric-protos-go
 * [fc5e63f](https://github.com/hyperledger/fabric/commit/fc5e63f) exclude go.mod and go.sum from license checks
 * [8167988](https://github.com/hyperledger/fabric/commit/8167988) rename GetDocker{file,Image}FromConfig
 * [37dc94c](https://github.com/hyperledger/fabric/commit/37dc94c) Remove vendored fabric code from ccenv

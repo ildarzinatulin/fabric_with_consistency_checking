@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package decoration
 
 import (
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go/peer"
 )
 
 // Decorator decorates a chaincode input

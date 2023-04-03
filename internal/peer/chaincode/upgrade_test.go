@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	"github.com/hyperledger/fabric/internal/peer/common"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 )

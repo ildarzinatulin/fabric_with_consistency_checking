@@ -13,11 +13,11 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/msp"
 	configtxtest "github.com/hyperledger/fabric/common/configtx/test"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/hyperledger/fabric/protoutil/mocks"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/msp"
 	"github.com/stretchr/testify/require"
 )
 

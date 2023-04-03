@@ -10,13 +10,13 @@ import (
 	"sync"
 	"testing"
 
+	proto "github.com/hyperledger/fabric-protos-go/gossip"
 	"github.com/hyperledger/fabric/gossip/discovery"
 	"github.com/hyperledger/fabric/gossip/metrics"
 	gmetricsmocks "github.com/hyperledger/fabric/gossip/metrics/mocks"
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/gossip/state/mocks"
 	"github.com/hyperledger/fabric/protoutil"
-	proto "github.com/ildarzinatulin/fabric-protos-go/gossip"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )

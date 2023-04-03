@@ -10,6 +10,8 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	commonerrors "github.com/hyperledger/fabric/common/errors"
 	"github.com/hyperledger/fabric/common/flogging"
 	validation "github.com/hyperledger/fabric/core/handlers/validation/api"
@@ -17,8 +19,6 @@ import (
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

@@ -7,12 +7,12 @@ SPDX-License-Identifier: Apache-2.0
 package multichannel
 
 import (
+	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/ledger/blockledger"
 	"github.com/hyperledger/fabric/common/policies"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/pkg/errors"
 )
 

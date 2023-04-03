@@ -14,14 +14,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hyperledger/fabric-protos-go/common"
+	protopeer "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/ledger/testutil"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/kvledger"
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/statedb/statecouchdb"
 	"github.com/hyperledger/fabric/core/ledger/mock"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	protopeer "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 )
 

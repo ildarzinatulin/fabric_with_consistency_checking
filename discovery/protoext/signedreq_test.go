@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/discovery"
 	"github.com/hyperledger/fabric/discovery/protoext"
-	"github.com/ildarzinatulin/fabric-protos-go/discovery"
 	"github.com/stretchr/testify/require"
 )
 

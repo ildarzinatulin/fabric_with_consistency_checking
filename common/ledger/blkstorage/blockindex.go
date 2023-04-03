@@ -13,12 +13,12 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/ledger/snapshot"
 	"github.com/hyperledger/fabric/common/ledger/util"
 	"github.com/hyperledger/fabric/common/ledger/util/leveldbhelper"
 	"github.com/hyperledger/fabric/internal/pkg/txflags"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

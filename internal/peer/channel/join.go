@@ -12,11 +12,11 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	pcommon "github.com/hyperledger/fabric-protos-go/common"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/core/scc/cscc"
 	"github.com/hyperledger/fabric/internal/peer/common"
 	"github.com/hyperledger/fabric/protoutil"
-	pcommon "github.com/ildarzinatulin/fabric-protos-go/common"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/spf13/cobra"
 )
 

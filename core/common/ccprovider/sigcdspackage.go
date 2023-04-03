@@ -23,11 +23,11 @@ import (
 	"os"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/bccsp/factory"
 	"github.com/hyperledger/fabric/core/common/ccpackage"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 )
 
 //----- SignedCDSData ------

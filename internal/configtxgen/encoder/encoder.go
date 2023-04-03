@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 
 	"github.com/golang/protobuf/proto"
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/genesis"
@@ -22,8 +24,6 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/identity"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

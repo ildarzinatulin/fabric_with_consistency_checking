@@ -14,9 +14,9 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/msp"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )

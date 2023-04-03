@@ -14,9 +14,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go/peer"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
+	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
+	"github.com/hyperledger/fabric-protos-go/ledger/rwset/kvrwset"
 	"github.com/hyperledger/fabric/common/ledger/testutil"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/internal/version"
@@ -24,9 +27,6 @@ import (
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	btltestutil "github.com/hyperledger/fabric/core/ledger/pvtdatapolicy/testutil"
 	"github.com/hyperledger/fabric/core/ledger/util"
-	"github.com/ildarzinatulin/fabric-protos-go/ledger/queryresult"
-	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset"
-	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset/kvrwset"
 	"github.com/stretchr/testify/require"
 )
 

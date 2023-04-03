@@ -9,9 +9,9 @@ package ordererclient
 import (
 	"context"
 
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/integration/nwo"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer"
 	"github.com/pkg/errors"
 )
 

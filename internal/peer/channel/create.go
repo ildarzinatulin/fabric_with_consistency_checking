@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/common/configtx"
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/internal/configtxgen/encoder"
@@ -19,7 +20,6 @@ import (
 	"github.com/hyperledger/fabric/internal/peer/common"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

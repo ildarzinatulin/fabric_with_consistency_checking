@@ -12,6 +12,9 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
+	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/configtx"
@@ -24,9 +27,6 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/txflags"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	mspprotos "github.com/ildarzinatulin/fabric-protos-go/msp"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

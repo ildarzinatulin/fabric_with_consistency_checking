@@ -10,10 +10,10 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

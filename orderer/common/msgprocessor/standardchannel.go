@@ -10,15 +10,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hyperledger/fabric-protos-go/common"
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/policies"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
 	"github.com/hyperledger/fabric/orderer/common/localconfig"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer"
 	"github.com/pkg/errors"
 	"github.com/syndtr/goleveldb/leveldb"
 )

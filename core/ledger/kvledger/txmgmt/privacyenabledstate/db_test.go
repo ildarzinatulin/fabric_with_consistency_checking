@@ -13,6 +13,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/ledger/testutil"
 	"github.com/hyperledger/fabric/core/common/ccprovider"
 	"github.com/hyperledger/fabric/core/ledger/cceventmgmt"
@@ -23,7 +24,6 @@ import (
 	"github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/statedb/stateleveldb"
 	"github.com/hyperledger/fabric/core/ledger/mock"
 	"github.com/hyperledger/fabric/core/ledger/util"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 )
 

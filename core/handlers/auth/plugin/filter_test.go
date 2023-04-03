@@ -10,7 +10,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 )
 

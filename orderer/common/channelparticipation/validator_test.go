@@ -11,10 +11,10 @@ import (
 	"math"
 	"testing"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/orderer/common/channelparticipation"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/stretchr/testify/require"
 )
 

@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/common/ledger/blkstorage"
 	"github.com/hyperledger/fabric/common/ledger/dataformat"
 	"github.com/hyperledger/fabric/common/ledger/util/leveldbhelper"
@@ -25,7 +26,6 @@ import (
 	"github.com/hyperledger/fabric/core/ledger/pvtdatastorage"
 	"github.com/hyperledger/fabric/internal/fileutil"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/pkg/errors"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/vldmkr/merkle-patricia-trie/mpt"

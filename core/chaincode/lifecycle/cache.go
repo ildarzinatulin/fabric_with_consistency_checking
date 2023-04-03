@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"sync"
 
+	lb "github.com/hyperledger/fabric-protos-go/peer/lifecycle"
 	"github.com/hyperledger/fabric/common/chaincode"
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/chaincode/implicitcollection"
@@ -19,7 +20,6 @@ import (
 	"github.com/hyperledger/fabric/core/container/externalbuilder"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/protoutil"
-	lb "github.com/ildarzinatulin/fabric-protos-go/peer/lifecycle"
 
 	"github.com/pkg/errors"
 )

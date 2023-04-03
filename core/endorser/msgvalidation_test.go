@@ -12,12 +12,12 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	mspproto "github.com/hyperledger/fabric-protos-go/msp"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/core/endorser"
 	"github.com/hyperledger/fabric/core/endorser/fake"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	mspproto "github.com/ildarzinatulin/fabric-protos-go/msp"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 
 	"github.com/golang/protobuf/proto"
 )

@@ -12,13 +12,13 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/gateway"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/ledger"
 	"github.com/hyperledger/fabric/internal/pkg/gateway/event"
 	"github.com/hyperledger/fabric/internal/pkg/gateway/event/mocks"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/gateway"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )

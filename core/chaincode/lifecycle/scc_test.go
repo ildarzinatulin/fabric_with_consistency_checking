@@ -15,6 +15,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
+	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
+	lb "github.com/hyperledger/fabric-protos-go/peer/lifecycle"
 	"github.com/hyperledger/fabric/common/chaincode"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/policydsl"
@@ -23,9 +26,6 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/persistence"
 	"github.com/hyperledger/fabric/core/dispatcher"
 	"github.com/hyperledger/fabric/msp"
-	mspprotos "github.com/ildarzinatulin/fabric-protos-go/msp"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
-	lb "github.com/ildarzinatulin/fabric-protos-go/peer/lifecycle"
 	"github.com/pkg/errors"
 
 	. "github.com/onsi/ginkgo/v2"

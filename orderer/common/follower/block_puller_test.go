@@ -13,6 +13,7 @@ import (
 	"sync/atomic"
 	"testing"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	"github.com/hyperledger/fabric/common/crypto/tlsgen"
@@ -26,7 +27,6 @@ import (
 	"github.com/hyperledger/fabric/orderer/common/follower/mocks"
 	"github.com/hyperledger/fabric/orderer/common/localconfig"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )

@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/ledger/ledgermgmt"
 	"github.com/hyperledger/fabric/core/ledger/util"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

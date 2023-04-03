@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	"github.com/hyperledger/fabric/common/capabilities"
 	"github.com/hyperledger/fabric/common/channelconfig"
@@ -20,7 +21,6 @@ import (
 	"github.com/hyperledger/fabric/internal/configtxgen/encoder"
 	"github.com/hyperledger/fabric/internal/configtxgen/genesisconfig"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/stretchr/testify/require"
 )
 

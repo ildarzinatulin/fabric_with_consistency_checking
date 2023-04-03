@@ -10,13 +10,13 @@ import (
 	"bytes"
 
 	"github.com/golang/protobuf/proto"
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/orderer"
+	protoetcdraft "github.com/hyperledger/fabric-protos-go/orderer/etcdraft"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/configtx"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer"
-	protoetcdraft "github.com/ildarzinatulin/fabric-protos-go/orderer/etcdraft"
 	"github.com/pkg/errors"
 )
 

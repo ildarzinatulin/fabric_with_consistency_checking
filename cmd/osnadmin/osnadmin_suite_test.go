@@ -9,8 +9,8 @@ package main
 import (
 	"testing"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/orderer/common/types"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

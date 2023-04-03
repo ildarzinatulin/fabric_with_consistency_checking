@@ -15,15 +15,15 @@ import (
 	"sync"
 
 	"github.com/golang/protobuf/proto"
+	dp "github.com/hyperledger/fabric-protos-go/discovery"
+	"github.com/hyperledger/fabric-protos-go/gossip"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/scc"
 	gossipapi "github.com/hyperledger/fabric/gossip/api"
 	gossipcommon "github.com/hyperledger/fabric/gossip/common"
 	gossipdiscovery "github.com/hyperledger/fabric/gossip/discovery"
-	dp "github.com/ildarzinatulin/fabric-protos-go/discovery"
-	"github.com/ildarzinatulin/fabric-protos-go/gossip"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

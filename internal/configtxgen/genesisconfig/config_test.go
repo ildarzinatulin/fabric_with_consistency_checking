@@ -9,9 +9,9 @@ package genesisconfig
 import (
 	"testing"
 
+	"github.com/hyperledger/fabric-protos-go/orderer/etcdraft"
 	"github.com/hyperledger/fabric/common/viperutil"
 	"github.com/hyperledger/fabric/core/config/configtest"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer/etcdraft"
 	"github.com/stretchr/testify/require"
 )
 

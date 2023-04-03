@@ -16,8 +16,8 @@ import (
 	"io/ioutil"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric/bccsp/utils"
-	"github.com/ildarzinatulin/fabric-protos-go/msp"
 )
 
 // A SigningIdentity represents an MSP signing identity.

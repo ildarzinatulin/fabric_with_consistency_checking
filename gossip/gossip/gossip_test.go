@@ -18,6 +18,8 @@ import (
 	"testing"
 	"time"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	proto "github.com/hyperledger/fabric-protos-go/gossip"
 	"github.com/hyperledger/fabric/bccsp/factory"
 	"github.com/hyperledger/fabric/common/metrics/disabled"
 	"github.com/hyperledger/fabric/gossip/api"
@@ -31,8 +33,6 @@ import (
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/gossip/util"
 	corecomm "github.com/hyperledger/fabric/internal/pkg/comm"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	proto "github.com/ildarzinatulin/fabric-protos-go/gossip"
 	"github.com/stretchr/testify/require"
 )
 

@@ -12,6 +12,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/proto"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/util"
 	"github.com/hyperledger/fabric/core/chaincode/extcc"
 	"github.com/hyperledger/fabric/core/chaincode/lifecycle"
@@ -22,7 +23,6 @@ import (
 	"github.com/hyperledger/fabric/core/peer"
 	"github.com/hyperledger/fabric/core/scc"
 	"github.com/hyperledger/fabric/msp"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

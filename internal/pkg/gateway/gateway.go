@@ -8,6 +8,7 @@ package gateway
 import (
 	"context"
 
+	peerproto "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/peer"
 	"github.com/hyperledger/fabric/core/scc"
@@ -16,7 +17,6 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/gateway/commit"
 	"github.com/hyperledger/fabric/internal/pkg/gateway/config"
 	"github.com/hyperledger/fabric/internal/pkg/gateway/ledger"
-	peerproto "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"google.golang.org/grpc"
 )
 

@@ -4,7 +4,7 @@ package fake
 import (
 	"sync"
 
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/core/chaincode"
 )
 

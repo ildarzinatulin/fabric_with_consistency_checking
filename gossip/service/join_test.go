@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	proto "github.com/hyperledger/fabric-protos-go/gossip"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/gossip/api"
 	"github.com/hyperledger/fabric/gossip/comm"
@@ -21,8 +23,6 @@ import (
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/gossip/util"
 	"github.com/hyperledger/fabric/msp"
-	proto "github.com/ildarzinatulin/fabric-protos-go/gossip"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )

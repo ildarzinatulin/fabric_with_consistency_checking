@@ -9,10 +9,10 @@ package etcdraft
 import (
 	"sync/atomic"
 
+	"github.com/hyperledger/fabric-protos-go/orderer/etcdraft"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/metrics"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer/etcdraft"
 	raft "go.etcd.io/etcd/raft/v3"
 )
 

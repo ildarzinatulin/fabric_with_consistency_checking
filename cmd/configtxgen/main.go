@@ -17,6 +17,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-config/protolator"
 	"github.com/hyperledger/fabric-config/protolator/protoext/ordererext"
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp/factory"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/flogging"
@@ -25,7 +26,6 @@ import (
 	"github.com/hyperledger/fabric/internal/configtxgen/metadata"
 	"github.com/hyperledger/fabric/internal/configtxlator/update"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/pkg/errors"
 )
 

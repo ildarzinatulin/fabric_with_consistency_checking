@@ -14,14 +14,14 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-config/protolator"
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
+	ab "github.com/hyperledger/fabric-protos-go/orderer"
+	"github.com/hyperledger/fabric-protos-go/orderer/etcdraft"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	"github.com/hyperledger/fabric/common/capabilities"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	mspprotos "github.com/ildarzinatulin/fabric-protos-go/msp"
-	ab "github.com/ildarzinatulin/fabric-protos-go/orderer"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer/etcdraft"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 )
 

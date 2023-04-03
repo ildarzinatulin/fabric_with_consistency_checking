@@ -13,15 +13,15 @@ import (
 	"testing"
 
 	"github.com/bits-and-blooms/bitset"
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/msp"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/ledger/util/leveldbhelper"
 	"github.com/hyperledger/fabric/core/chaincode/implicitcollection"
 	"github.com/hyperledger/fabric/core/ledger/confighistory/confighistorytest"
 	"github.com/hyperledger/fabric/core/ledger/internal/version"
 	"github.com/hyperledger/fabric/core/ledger/mock"
 	"github.com/hyperledger/fabric/internal/fileutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/msp"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
 )
 

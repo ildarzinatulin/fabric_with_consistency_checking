@@ -23,9 +23,12 @@ import (
 	"testing"
 	"time"
 
-	discovery_protos "github.com/ildarzinatulin/fabric-protos-go/discovery"
+	discovery_protos "github.com/hyperledger/fabric-protos-go/discovery"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/gossip"
+	msprotos "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	bccsp "github.com/hyperledger/fabric/bccsp/utils"
 	"github.com/hyperledger/fabric/common/cauthdsl"
@@ -54,9 +57,6 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/comm"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/gossip"
-	msprotos "github.com/ildarzinatulin/fabric-protos-go/msp"
 	"github.com/onsi/gomega/gexec"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"

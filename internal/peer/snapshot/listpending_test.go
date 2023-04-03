@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"testing"
 
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/internal/peer/snapshot/mock"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/stretchr/testify/require"
 )

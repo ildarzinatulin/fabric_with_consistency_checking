@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/flogging"
 	commonledger "github.com/hyperledger/fabric/common/ledger"
@@ -25,7 +26,6 @@ import (
 	"github.com/hyperledger/fabric/core/container/ccintf"
 	"github.com/hyperledger/fabric/core/ledger"
 	"github.com/hyperledger/fabric/core/scc"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

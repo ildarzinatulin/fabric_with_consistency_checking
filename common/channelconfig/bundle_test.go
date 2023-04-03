@@ -9,9 +9,9 @@ package channelconfig
 import (
 	"testing"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	ab "github.com/hyperledger/fabric-protos-go/orderer"
 	cc "github.com/hyperledger/fabric/common/capabilities"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	ab "github.com/ildarzinatulin/fabric-protos-go/orderer"
 	"github.com/stretchr/testify/require"
 )
 

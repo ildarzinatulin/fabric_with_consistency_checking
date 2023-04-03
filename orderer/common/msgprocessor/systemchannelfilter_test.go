@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"testing"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/configtx"
 	"github.com/hyperledger/fabric/core/config/configtest"
@@ -17,8 +19,6 @@ import (
 	"github.com/hyperledger/fabric/internal/configtxgen/genesisconfig"
 	"github.com/hyperledger/fabric/orderer/common/msgprocessor/mocks"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )

@@ -12,8 +12,8 @@ import (
 	"sync"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/flogging"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"go.uber.org/zap/zapcore"
 )
 

@@ -11,6 +11,8 @@ import (
 	"testing"
 	"time"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	ab "github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	"github.com/hyperledger/fabric/common/ledger/blockledger"
 	"github.com/hyperledger/fabric/common/ledger/blockledger/fileledger"
@@ -26,8 +28,6 @@ import (
 	"github.com/hyperledger/fabric/orderer/common/multichannel/mocks"
 	"github.com/hyperledger/fabric/orderer/consensus"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	ab "github.com/ildarzinatulin/fabric-protos-go/orderer"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"

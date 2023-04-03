@@ -10,8 +10,8 @@ import (
 	"context"
 	"fmt"
 
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/bccsp"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

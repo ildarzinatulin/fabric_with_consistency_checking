@@ -4,10 +4,10 @@
 package main
 
 import (
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/internal/configtxgen/encoder"
 	"github.com/hyperledger/fabric/internal/configtxgen/genesisconfig"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 )
 
 func newChainRequest(

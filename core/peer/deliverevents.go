@@ -9,6 +9,9 @@ package peer
 import (
 	"runtime/debug"
 
+	"github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/deliver"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/aclmgmt/resources"
@@ -18,9 +21,6 @@ import (
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/msp/mgmt"
 	"github.com/hyperledger/fabric/protoutil"
-	"github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/ledger/rwset"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 )
 

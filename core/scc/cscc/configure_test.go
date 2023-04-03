@@ -15,6 +15,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/bccsp/sw"
 	configtxtest "github.com/hyperledger/fabric/common/configtx/test"
 	"github.com/hyperledger/fabric/common/genesis"
@@ -40,8 +42,6 @@ import (
 	"github.com/hyperledger/fabric/msp/mgmt"
 	msptesttools "github.com/hyperledger/fabric/msp/mgmt/testtools"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"

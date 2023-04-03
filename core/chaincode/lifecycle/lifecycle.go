@@ -11,6 +11,10 @@ import (
 	"fmt"
 	"sync"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	"github.com/hyperledger/fabric-protos-go/msp"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
+	lb "github.com/hyperledger/fabric-protos-go/peer/lifecycle"
 	"github.com/hyperledger/fabric/common/chaincode"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/policydsl"
@@ -18,10 +22,6 @@ import (
 	"github.com/hyperledger/fabric/core/chaincode/persistence"
 	"github.com/hyperledger/fabric/core/container"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	"github.com/ildarzinatulin/fabric-protos-go/msp"
-	pb "github.com/ildarzinatulin/fabric-protos-go/peer"
-	lb "github.com/ildarzinatulin/fabric-protos-go/peer/lifecycle"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"

@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 package channelconfig
 
 import (
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/common/cauthdsl"
 	"github.com/hyperledger/fabric/common/configtx"
@@ -14,7 +15,6 @@ import (
 	"github.com/hyperledger/fabric/common/policies"
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	"github.com/pkg/errors"
 )
 

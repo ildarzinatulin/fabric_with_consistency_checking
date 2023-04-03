@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 package etcdraft
 
 import (
+	"github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/common/flogging"
-	"github.com/ildarzinatulin/fabric-protos-go/orderer"
 	"github.com/pkg/errors"
 )
 

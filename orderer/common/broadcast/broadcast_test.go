@@ -15,11 +15,11 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	cb "github.com/hyperledger/fabric-protos-go/common"
+	ab "github.com/hyperledger/fabric-protos-go/orderer"
 	"github.com/hyperledger/fabric/orderer/common/broadcast"
 	"github.com/hyperledger/fabric/orderer/common/broadcast/mock"
 	"github.com/hyperledger/fabric/orderer/common/msgprocessor"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
-	ab "github.com/ildarzinatulin/fabric-protos-go/orderer"
 )
 
 var _ = Describe("Broadcast", func() {

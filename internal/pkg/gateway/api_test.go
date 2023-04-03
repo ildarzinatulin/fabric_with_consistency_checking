@@ -16,6 +16,13 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/timestamp"
+	cp "github.com/hyperledger/fabric-protos-go/common"
+	dp "github.com/hyperledger/fabric-protos-go/discovery"
+	pb "github.com/hyperledger/fabric-protos-go/gateway"
+	"github.com/hyperledger/fabric-protos-go/gossip"
+	"github.com/hyperledger/fabric-protos-go/msp"
+	ab "github.com/hyperledger/fabric-protos-go/orderer"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric/common/crypto/tlsgen"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/common/flogging/mock"
@@ -30,13 +37,6 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/gateway/mocks"
 	idmocks "github.com/hyperledger/fabric/internal/pkg/identity/mocks"
 	"github.com/hyperledger/fabric/protoutil"
-	cp "github.com/ildarzinatulin/fabric-protos-go/common"
-	dp "github.com/ildarzinatulin/fabric-protos-go/discovery"
-	pb "github.com/ildarzinatulin/fabric-protos-go/gateway"
-	"github.com/ildarzinatulin/fabric-protos-go/gossip"
-	"github.com/ildarzinatulin/fabric-protos-go/msp"
-	ab "github.com/ildarzinatulin/fabric-protos-go/orderer"
-	"github.com/ildarzinatulin/fabric-protos-go/peer"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
@@ -73,7 +73,7 @@ type commitFinder interface {
 	CommitFinder
 }
 
-//go:generate counterfeiter -o mocks/chaincodeeventsserver.go --fake-name ChaincodeEventsServer github.com/ildarzinatulin/fabric-protos-go/gateway.Gateway_ChaincodeEventsServer
+//go:generate counterfeiter -o mocks/chaincodeeventsserver.go --fake-name ChaincodeEventsServer github.com/hyperledger/fabric-protos-go/gateway.Gateway_ChaincodeEventsServer
 
 //go:generate counterfeiter -o mocks/aclchecker.go --fake-name ACLChecker . aclChecker
 type aclChecker interface {

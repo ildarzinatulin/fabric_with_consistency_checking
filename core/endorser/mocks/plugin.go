@@ -8,8 +8,8 @@ SPDX-License-Identifier: Apache-2.0
 package mocks
 
 import (
+	peer "github.com/hyperledger/fabric-protos-go/peer"
 	endorsement "github.com/hyperledger/fabric/core/handlers/endorsement/api"
-	peer "github.com/ildarzinatulin/fabric-protos-go/peer"
 	mock "github.com/stretchr/testify/mock"
 )
 

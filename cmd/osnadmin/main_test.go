@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 
 	"github.com/golang/protobuf/proto"
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric/cmd/osnadmin/mocks"
 	"github.com/hyperledger/fabric/common/crypto/tlsgen"
@@ -27,7 +28,6 @@ import (
 	"github.com/hyperledger/fabric/orderer/common/localconfig"
 	"github.com/hyperledger/fabric/orderer/common/types"
 	"github.com/hyperledger/fabric/protoutil"
-	cb "github.com/ildarzinatulin/fabric-protos-go/common"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
