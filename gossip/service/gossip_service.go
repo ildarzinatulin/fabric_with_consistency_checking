@@ -318,12 +318,13 @@ func (g *GossipService) NewConfigEventer() ConfigProcessor {
 // Support aggregates functionality of several
 // interfaces required by gossip service
 type Support struct {
-	Validator            txvalidator.Validator
-	Committer            committer.Committer
-	CollectionStore      privdata.CollectionStore
-	IdDeserializeFactory gossipprivdata.IdentityDeserializerFactory
-	CapabilityProvider   gossipprivdata.CapabilityProvider
-	StateTrie            *mpt.Trie
+	Validator                             txvalidator.Validator
+	Committer                             committer.Committer
+	CollectionStore                       privdata.CollectionStore
+	IdDeserializeFactory                  gossipprivdata.IdentityDeserializerFactory
+	CapabilityProvider                    gossipprivdata.CapabilityProvider
+	StateTrie                             *mpt.Trie
+	AttestationCheckingParametersProvider gossipprivdata.AttestationCheckingParametersProvider
 }
 
 // InitializeChannel allocates the state provider and should be invoked once per channel per execution
@@ -353,13 +354,14 @@ func (g *GossipService) InitializeChannel(channelID string, ordererSource *order
 	}
 
 	coordinator := gossipprivdata.NewCoordinator(mspID, gossipprivdata.Support{
-		ChainID:            channelID,
-		CollectionStore:    support.CollectionStore,
-		Validator:          support.Validator,
-		Committer:          support.Committer,
-		Fetcher:            fetcher,
-		CapabilityProvider: support.CapabilityProvider,
-		Trie:               support.StateTrie,
+		ChainID:                               channelID,
+		CollectionStore:                       support.CollectionStore,
+		Validator:                             support.Validator,
+		Committer:                             support.Committer,
+		Fetcher:                               fetcher,
+		CapabilityProvider:                    support.CapabilityProvider,
+		Trie:                                  support.StateTrie,
+		AttestationCheckingParametersProvider: support.AttestationCheckingParametersProvider,
 	}, store, selfSignedData, g.metrics.PrivdataMetrics, coordinatorConfig,
 		support.IdDeserializeFactory, broadcastClient, g.signer)
 

@@ -104,6 +104,14 @@ func (c *Channel) Capabilities() channelconfig.ApplicationCapabilities {
 	return ac.Capabilities()
 }
 
+func (c *Channel) AttestationCheckingParameters() channelconfig.AttestationCheckingParameters {
+	ac, ok := c.Resources().ApplicationConfig()
+	if !ok {
+		return nil
+	}
+	return ac.AttestationCheckingParameters()
+}
+
 // GetMSPIDs retrieves the MSP IDs of the organizations in the current channel
 // configuration.
 func (c *Channel) GetMSPIDs() []string {

@@ -379,12 +379,13 @@ func (p *Peer) createChannel(
 	}
 	simpleCollectionStore := privdata.NewSimpleCollectionStore(l, deployedCCInfoProvider, idDeserializerFactory)
 	p.GossipService.InitializeChannel(bundle.ConfigtxValidator().ChannelID(), ordererSource, store, gossipservice.Support{
-		Validator:            validator,
-		Committer:            committer,
-		CollectionStore:      simpleCollectionStore,
-		IdDeserializeFactory: idDeserializerFactory,
-		CapabilityProvider:   channel,
-		StateTrie:            stateTrieBundle.trie,
+		Validator:                             validator,
+		Committer:                             committer,
+		CollectionStore:                       simpleCollectionStore,
+		IdDeserializeFactory:                  idDeserializerFactory,
+		CapabilityProvider:                    channel,
+		StateTrie:                             stateTrieBundle.trie,
+		AttestationCheckingParametersProvider: channel,
 	})
 
 	p.mutex.Lock()

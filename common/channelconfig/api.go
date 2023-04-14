@@ -55,6 +55,16 @@ type Application interface {
 
 	// Capabilities defines the capabilities for the application portion of a channel
 	Capabilities() ApplicationCapabilities
+
+	AttestationCheckingParameters() AttestationCheckingParameters
+}
+
+type AttestationCheckingParameters interface {
+	EnableChecking() bool
+
+	RequiredNumberOfMessages() uint32
+
+	Frequency() uint32
 }
 
 // Channel gives read only access to the channel configuration

@@ -19,12 +19,15 @@ const (
 
 	// ACLsKey is the name of the ACLs config
 	ACLsKey = "ACLs"
+
+	AttestationCheckingParametersKey = "AttestationCheckingParameters"
 )
 
 // ApplicationProtos is used as the source of the ApplicationConfig
 type ApplicationProtos struct {
-	ACLs         *pb.ACLs
-	Capabilities *cb.Capabilities
+	ACLs                          *pb.ACLs
+	Capabilities                  *cb.Capabilities
+	AttestationCheckingParameters *cb.AttestationCheckingParameters
 }
 
 // ApplicationConfig implements the Application interface
@@ -76,4 +79,8 @@ func (ac *ApplicationConfig) APIPolicyMapper() PolicyMapper {
 	pm := newAPIsProvider(ac.protos.ACLs.Acls)
 
 	return pm
+}
+
+func (ac *ApplicationConfig) AttestationCheckingParameters() AttestationCheckingParameters {
+	return newAttestationCheckingParameters(ac.protos.AttestationCheckingParameters)
 }

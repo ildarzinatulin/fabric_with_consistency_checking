@@ -339,6 +339,13 @@ func NewApplicationGroup(conf *genesisconfig.Application) (*cb.ConfigGroup, erro
 		addValue(applicationGroup, channelconfig.CapabilitiesValue(conf.Capabilities), channelconfig.AdminsPolicyKey)
 	}
 
+	if conf.AttestationCheckingParameters.EnableChecking {
+		addValue(applicationGroup, channelconfig.AttestationCheckingValue(
+			conf.AttestationCheckingParameters.RequiredNumberOfMessages,
+			conf.AttestationCheckingParameters.Frequency,
+		), channelconfig.AdminsPolicyKey)
+	}
+
 	for _, org := range conf.Organizations {
 		var err error
 		applicationGroup.Groups[org.Name], err = NewApplicationOrgGroup(org)

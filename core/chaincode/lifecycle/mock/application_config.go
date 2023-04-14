@@ -40,6 +40,30 @@ type ApplicationConfig struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+
+	AttestationCheckingParametersStub        func() channelconfig.AttestationCheckingParameters
+	AttestationCheckingParametersMutex       sync.RWMutex
+	AttestationCheckingParametersReturns struct {
+		result1 channelconfig.AttestationCheckingParameters
+	}
+}
+
+func (fake *ApplicationConfig) AttestationCheckingParameters() channelconfig.AttestationCheckingParameters {
+	fake.AttestationCheckingParametersMutex.Lock()
+	stub := fake.AttestationCheckingParametersStub
+	fakeReturns := fake.AttestationCheckingParametersReturns
+	fake.recordInvocation("AttestationCheckingParameters", []interface{}{})
+	fake.AttestationCheckingParametersMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	return fakeReturns.result1
+}
+
+func (fake *ApplicationConfig) AttestationCheckingParametersCalls(stub func() channelconfig.AttestationCheckingParameters) {
+	fake.AttestationCheckingParametersMutex.Lock()
+	defer fake.AttestationCheckingParametersMutex.Unlock()
+	fake.AttestationCheckingParametersStub = stub
 }
 
 func (fake *ApplicationConfig) APIPolicyMapper() channelconfig.PolicyMapper {

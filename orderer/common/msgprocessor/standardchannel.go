@@ -45,6 +45,8 @@ type StandardChannelSupport interface {
 	ProposeConfigUpdate(configtx *cb.Envelope) (*cb.ConfigEnvelope, error)
 
 	OrdererConfig() (channelconfig.Orderer, bool)
+
+	ApplicationConfig() (channelconfig.Application, bool)
 }
 
 // StandardChannel implements the Processor interface for standard extant channels
@@ -181,6 +183,11 @@ func (s *StandardChannel) ProcessConfigMsg(env *cb.Envelope) (config *cb.Envelop
 func (s *StandardChannel) ProcessAttestationMsg(env *cb.Envelope) (attestationResultEnv *cb.Envelope, configSeq uint64, err error) {
 	logger.Debugf("Processing attestation message for channel %s", s.support.ChannelID())
 
+	if !s.attestationCheckingEnabled() {
+		logger.Info("attestation checking disabled")
+		return nil, 0, nil
+	}
+
 	if s.attestationMessagesStorage == nil {
 		logger.Warning("attestation messages storage is not init")
 		return nil, 0, nil
@@ -224,16 +231,28 @@ func (s *StandardChannel) ProcessAttestationMsg(env *cb.Envelope) (attestationRe
 		}
 	}
 
-	return nil, 0, err
+	return nil, 0, nil
 }
 
-func (s *StandardChannel) getThresholdForAttestationResult() int {
-	return 2 // todo should be set by channel configuration
+func (s *StandardChannel) attestationCheckingEnabled() bool {
+	config, exist := s.support.ApplicationConfig()
+	if exist {
+		return config.AttestationCheckingParameters().EnableChecking()
+	}
+	return false
 }
 
-func (s *StandardChannel) countTrieHeads(existMessages []byte) map[string]int {
+func (s *StandardChannel) getThresholdForAttestationResult() uint32 {
+	config, exist := s.support.ApplicationConfig()
+	if exist {
+		return config.AttestationCheckingParameters().RequiredNumberOfMessages()
+	}
+	return 0
+}
+
+func (s *StandardChannel) countTrieHeads(existMessages []byte) map[string]uint32 {
 	allMessages := strings.Split(string(existMessages), "#")
-	trieHeadCounter := make(map[string]int)
+	trieHeadCounter := make(map[string]uint32)
 	for _, trieHead := range allMessages {
 		trieHeadCounter[trieHead] += 1
 	}

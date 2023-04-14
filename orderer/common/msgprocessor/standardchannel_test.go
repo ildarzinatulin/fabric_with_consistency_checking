@@ -27,6 +27,7 @@ type mockSystemChannelFilterSupport struct {
 	ProposeConfigUpdateErr error
 	SequenceVal            uint64
 	OrdererConfigVal       channelconfig.Orderer
+	ApplicationConfigVal   channelconfig.Application
 }
 
 func (ms *mockSystemChannelFilterSupport) ProposeConfigUpdate(env *cb.Envelope) (*cb.ConfigEnvelope, error) {
@@ -51,6 +52,14 @@ func (ms *mockSystemChannelFilterSupport) OrdererConfig() (channelconfig.Orderer
 	}
 
 	return ms.OrdererConfigVal, true
+}
+
+func (ms *mockSystemChannelFilterSupport) ApplicationConfig() (channelconfig.Application, bool) {
+	if ms.ApplicationConfigVal == nil {
+		return nil, false
+	}
+
+	return ms.ApplicationConfigVal, true
 }
 
 func TestClassifyMsg(t *testing.T) {

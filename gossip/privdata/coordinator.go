@@ -96,6 +96,10 @@ type CapabilityProvider interface {
 	Capabilities() channelconfig.ApplicationCapabilities
 }
 
+type AttestationCheckingParametersProvider interface {
+	AttestationCheckingParameters() channelconfig.AttestationCheckingParameters
+}
+
 // Support encapsulates set of interfaces to
 // aggregate required functionality by single struct
 type Support struct {
@@ -106,6 +110,7 @@ type Support struct {
 	Fetcher
 	CapabilityProvider
 	*mpt.Trie
+	AttestationCheckingParametersProvider
 }
 
 // CoordinatorConfig encapsulates the config that is passed to a new coordinator
@@ -252,7 +257,10 @@ func (c *coordinator) StoreBlock(block *cb.Block, privateDataSets util.PvtDataCo
 }
 
 func (c *coordinator) shouldSendAttestationMessage(block *cb.Block) bool {
-	return block.Header.GetNumber()%10 == 0 && block.Header.GetNumber() != 0 // todo should be set by channel configuration
+	if !c.Support.AttestationCheckingParameters().EnableChecking() {
+		return false
+	}
+	return block.Header.GetNumber()%uint64(c.Support.AttestationCheckingParameters().Frequency()) == 0 && block.Header.GetNumber() != 0
 }
 
 func (c *coordinator) sendAttestationMessage(lastBlockNumber uint64) error {

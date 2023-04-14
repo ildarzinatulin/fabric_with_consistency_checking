@@ -101,10 +101,17 @@ type Consortium struct {
 // Application encodes the application-level configuration needed in config
 // transactions.
 type Application struct {
-	Organizations []*Organization    `yaml:"Organizations"`
-	Capabilities  map[string]bool    `yaml:"Capabilities"`
-	Policies      map[string]*Policy `yaml:"Policies"`
-	ACLs          map[string]string  `yaml:"ACLs"`
+	Organizations                 []*Organization               `yaml:"Organizations"`
+	Capabilities                  map[string]bool               `yaml:"Capabilities"`
+	Policies                      map[string]*Policy            `yaml:"Policies"`
+	ACLs                          map[string]string             `yaml:"ACLs"`
+	AttestationCheckingParameters AttestationCheckingParameters `yaml:"RequiredNumberOfAttestationMessages"`
+}
+
+type AttestationCheckingParameters struct {
+	EnableChecking           bool   `yaml:"EnableChecking"`
+	RequiredNumberOfMessages uint32 `yaml:"RequiredNumberOfMessages"`
+	Frequency                uint32 `yaml:"Frequency"`
 }
 
 // Organization encodes the organization-level configuration needed in

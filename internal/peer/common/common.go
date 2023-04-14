@@ -23,7 +23,6 @@ import (
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/flogging"
 	"github.com/hyperledger/fabric/core/config"
-	"github.com/hyperledger/fabric/core/scc/cscc"
 	"github.com/hyperledger/fabric/internal/pkg/comm"
 	"github.com/hyperledger/fabric/msp"
 	mspmgmt "github.com/hyperledger/fabric/msp/mgmt"
@@ -238,7 +237,7 @@ func GetOrdererEndpointOfChain(chainID string, signer Signer, endorserClient pb.
 		ChaincodeSpec: &pb.ChaincodeSpec{
 			Type:        pb.ChaincodeSpec_Type(pb.ChaincodeSpec_Type_value["GOLANG"]),
 			ChaincodeId: &pb.ChaincodeID{Name: "cscc"},
-			Input:       &pb.ChaincodeInput{Args: [][]byte{[]byte(cscc.GetChannelConfig), []byte(chainID)}},
+			Input:       &pb.ChaincodeInput{Args: [][]byte{[]byte("GetChannelConfig"), []byte(chainID)}},
 		},
 	}
 

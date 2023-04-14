@@ -46,6 +46,21 @@ func (_m *ChannelResources) Capabilities() channelconfig.ApplicationCapabilities
 	return r0
 }
 
+func (_m *ChannelResources) AttestationCheckingParameters() channelconfig.AttestationCheckingParameters {
+	ret := _m.Called()
+
+	var r0 channelconfig.AttestationCheckingParameters
+	if rf, ok := ret.Get(0).(func() channelconfig.AttestationCheckingParameters); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(channelconfig.AttestationCheckingParameters)
+		}
+	}
+
+	return r0
+}
+
 // GetMSPIDs provides a mock function with given fields:
 func (_m *ChannelResources) GetMSPIDs() []string {
 	ret := _m.Called()
