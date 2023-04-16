@@ -19,7 +19,6 @@ import (
 	"github.com/hyperledger/fabric/orderer/common/localconfig"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 // ChannelConfigTemplator can be used to generate config templates.
@@ -42,10 +41,8 @@ type SystemChannel struct {
 // NewSystemChannel creates a new system channel message processor.
 func NewSystemChannel(support StandardChannelSupport, templator ChannelConfigTemplator, filters *RuleSet, bccsp bccsp.BCCSP) *SystemChannel {
 	logger.Debugf("Creating system channel msg processor for channel %s", support.ChannelID())
-	attestationMessagesStorage, err := leveldb.OpenFile("/mptDB/orderer/attestationMessagesStorages/"+support.ChannelID(), nil)
-	if err != nil {
-		logger.Errorf("Error while init level db in /mptDB/orderer/attestationMessagesStorage/%s: %s", support.ChannelID(), err)
-	}
+
+	attestationMessagesStorage := NewAttestationMessageStorage(support.ChannelID())
 	return &SystemChannel{
 		StandardChannel: NewStandardChannel(support, filters, bccsp, attestationMessagesStorage),
 		templator:       templator,

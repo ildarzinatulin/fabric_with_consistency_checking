@@ -19,7 +19,6 @@ import (
 	"github.com/hyperledger/fabric/orderer/consensus/inactive"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 // ChainSupport holds the resources for a particular channel.
@@ -72,10 +71,7 @@ func newChainSupport(
 		BCCSP: bccsp,
 	}
 
-	attestationMessagesStorage, err := leveldb.OpenFile("/mptDB/orderer/attestationMessagesStorages/"+ledgerResources.ConfigtxValidator().ChannelID(), nil)
-	if err != nil {
-		logger.Errorf("Error while init level db in /mptDB/orderer/attestationMessagesStorage/%s: %s", ledgerResources.ConfigtxValidator().ChannelID(), err)
-	}
+	attestationMessagesStorage := msgprocessor.NewAttestationMessageStorage(ledgerResources.ConfigtxValidator().ChannelID())
 
 	// Set up the msgprocessor
 	cs.Processor = msgprocessor.NewStandardChannel(cs, msgprocessor.CreateStandardChannelFilters(cs, registrar.config), bccsp, attestationMessagesStorage)
@@ -196,10 +192,7 @@ func newOnBoardingChainSupport(
 	bccsp bccsp.BCCSP,
 ) (*ChainSupport, error) {
 	cs := &ChainSupport{ledgerResources: ledgerResources}
-	attestationMessagesStorage, err := leveldb.OpenFile("/mptDB/orderer/attestationMessagesStorages/"+ledgerResources.ConfigtxValidator().ChannelID(), nil)
-	if err != nil {
-		logger.Errorf("Error while init level db in /mptDB/orderer/attestationMessagesStorage/%s: %s", ledgerResources.ConfigtxValidator().ChannelID(), err)
-	}
+	attestationMessagesStorage := msgprocessor.NewAttestationMessageStorage(ledgerResources.ConfigtxValidator().ChannelID())
 	cs.Processor = msgprocessor.NewStandardChannel(cs, msgprocessor.CreateStandardChannelFilters(cs, config), bccsp, attestationMessagesStorage)
 	cs.Chain = &inactive.Chain{Err: errors.New("system channel creation pending: server requires restart")}
 	cs.StatusReporter = consensus.StaticStatusReporter{ConsensusRelation: types.ConsensusRelationConsenter, Status: types.StatusInactive}

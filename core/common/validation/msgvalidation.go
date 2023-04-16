@@ -314,6 +314,8 @@ func ValidateTransaction(e *common.Envelope, cryptoProvider bccsp.BCCSP) (*commo
 			return payload, pb.TxValidationCode_INVALID_CONFIG_TRANSACTION
 		}
 		return payload, pb.TxValidationCode_VALID
+	case common.HeaderType_ATTESTATION:
+		return payload, pb.TxValidationCode_VALID
 	default:
 		return nil, pb.TxValidationCode_UNSUPPORTED_TX_PAYLOAD
 	}
