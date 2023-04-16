@@ -99,7 +99,6 @@ func NewLockBasedTxMgr(initializer *Initializer) (*LockBasedTxMgr, error) {
 	if err := initializer.DB.Open(); err != nil {
 		return nil, err
 	}
-
 	txmgr := &LockBasedTxMgr{
 		ledgerid:       initializer.LedgerID,
 		db:             initializer.DB,
@@ -578,30 +577,6 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 		return nil
 	}
 
-	for ns, nsBatch := range txmgr.currentUpdates.batch.PvtUpdates.UpdateMap {
-		for _, coll := range nsBatch.GetCollectionNames() {
-			for key, vv := range nsBatch.GetUpdates(coll) {
-				if vv.Value == nil {
-					err := txmgr.stateTrie.Put([]byte(ns+coll+key), nil)
-					if err != nil {
-						return err
-					}
-					continue
-				}
-
-				v := make([]byte, 0, len(vv.Metadata)+len(vv.Value)+len(vv.Version.ToBytes()))
-				v = append(v, vv.Metadata...)
-				v = append(v, vv.Value...)
-				v = append(v, vv.Version.ToBytes()...)
-
-				err := txmgr.stateTrie.Put([]byte(ns+coll+key), v)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-
 	namespaces := txmgr.currentUpdates.batch.PubUpdates.GetUpdatedNamespaces()
 	for _, ns := range namespaces {
 		updates := txmgr.currentUpdates.batch.PubUpdates.GetUpdates(ns)
@@ -651,11 +626,6 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 	}
 
 	txmgr.stateTrie.Commit()
-
-	err := txmgr.mptStorage.Put([]byte(txmgr.ledgerid), txmgr.stateTrie.RootHash())
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
