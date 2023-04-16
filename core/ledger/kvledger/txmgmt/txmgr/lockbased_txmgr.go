@@ -601,30 +601,6 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 		}
 	}
 
-	for ns, nsBatch := range txmgr.currentUpdates.batch.HashUpdates.UpdateMap {
-		for _, coll := range nsBatch.GetCollectionNames() {
-			for key, vv := range nsBatch.GetUpdates(coll) {
-				if vv.Value == nil {
-					err := txmgr.stateTrie.Put([]byte(ns+coll+key), nil)
-					if err != nil {
-						return err
-					}
-					continue
-				}
-
-				v := make([]byte, 0, len(vv.Metadata)+len(vv.Value)+len(vv.Version.ToBytes()))
-				v = append(v, vv.Metadata...)
-				v = append(v, vv.Value...)
-				v = append(v, vv.Version.ToBytes()...)
-
-				err := txmgr.stateTrie.Put([]byte(ns+coll+key), v)
-				if err != nil {
-					return err
-				}
-			}
-		}
-	}
-
 	txmgr.stateTrie.Commit()
 
 	return nil
