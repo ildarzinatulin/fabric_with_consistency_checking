@@ -515,6 +515,11 @@ var _ = Describe("Encoder", func() {
 				Capabilities: map[string]bool{
 					"FakeCapability": true,
 				},
+				AttestationCheckingParameters: genesisconfig.AttestationCheckingParameters{
+					EnableChecking:           true,
+					RequiredNumberOfMessages: 3,
+					Frequency:                5,
+				},
 			}
 		})
 
@@ -527,9 +532,10 @@ var _ = Describe("Encoder", func() {
 			Expect(cg.Policies["Writers"]).NotTo(BeNil())
 			Expect(len(cg.Groups)).To(Equal(1))
 			Expect(cg.Groups["SampleOrg"]).NotTo(BeNil())
-			Expect(len(cg.Values)).To(Equal(2))
+			Expect(len(cg.Values)).To(Equal(3))
 			Expect(cg.Values["ACLs"]).NotTo(BeNil())
 			Expect(cg.Values["Capabilities"]).NotTo(BeNil())
+			Expect(cg.Values["AttestationCheckingParameters"]).NotTo(BeNil())
 		})
 
 		Context("when the policy definition is bad", func() {

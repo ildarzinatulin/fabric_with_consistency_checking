@@ -11,6 +11,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
+	"github.com/vldmkr/merkle-patricia-trie/storage"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
@@ -99,6 +102,7 @@ func (env *lockBasedEnv) init(t *testing.T, testLedgerID string, btlPolicy pvtda
 	}
 	env.testBookkeepingEnv = bookkeeping.NewTestEnv(t)
 
+	trie := mpt.New(nil, storage.NewMemoryAdapter())
 	txmgrInitializer := &Initializer{
 		LedgerID:            testLedgerID,
 		DB:                  env.testDB,
@@ -108,6 +112,7 @@ func (env *lockBasedEnv) init(t *testing.T, testLedgerID string, btlPolicy pvtda
 		CCInfoProvider:      &mock.DeployedChaincodeInfoProvider{},
 		CustomTxProcessors:  nil,
 		HashFunc:            testHashFunc,
+		StateTrie:           trie,
 	}
 	env.txmgr, err = NewLockBasedTxMgr(txmgrInitializer)
 	require.NoError(t, err)

@@ -162,14 +162,13 @@ func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.Broad
 		logger.Debugf("[channel: %s] Broadcast is processing attestation message from %s", chdr.ChannelId, addr)
 
 		attestationResult, configSeq, err := processor.ProcessAttestationMsg(msg)
-
 		if err != nil {
 			logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s because of error: %s", chdr.ChannelId, addr, err)
 			return &ab.BroadcastResponse{Status: ClassifyError(err), Info: err.Error()}
 		}
-		if attestationResult != nil {
-			tracker.EndValidate()
+		tracker.EndValidate()
 
+		if attestationResult != nil {
 			tracker.BeginEnqueue()
 			if err = processor.WaitReady(); err != nil {
 				logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s with SERVICE_UNAVAILABLE: rejected by Consenter: %s", chdr.ChannelId, addr, err)

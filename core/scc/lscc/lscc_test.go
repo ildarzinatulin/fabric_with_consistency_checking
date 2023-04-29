@@ -45,7 +45,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//go:generate counterfeiter -o mock/application.go -fake-name Application . application
+//go:generate counterfeiter --o mock/application.go -fake-name Application . application
 
 type application interface {
 	channelconfig.Application

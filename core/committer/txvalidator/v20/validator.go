@@ -114,7 +114,7 @@ type TxValidator struct {
 	LedgerResources  LedgerResources
 	Dispatcher       Dispatcher
 	CryptoProvider   bccsp.BCCSP
-	StateTrieStorage *storage.LevelDBAdapter // TODO may be it's better to make а manager for checking head existing
+	StateTrieStorage storage.StorageAdapter // TODO may be it's better to make а manager for checking head existing
 }
 
 var logger = flogging.MustGetLogger("committer.txvalidator")
@@ -143,7 +143,7 @@ func NewTxValidator(
 	pm plugin.Mapper,
 	channelPolicyManagerGetter policies.ChannelPolicyManagerGetter,
 	cryptoProvider bccsp.BCCSP,
-	stateTrieStorage *storage.LevelDBAdapter,
+	stateTrieStorage storage.StorageAdapter,
 ) *TxValidator {
 	// Encapsulates interface implementation
 	pluginValidator := plugindispatcher.NewPluginValidator(pm, ler, &dynamicDeserializer{cr: cr}, &dynamicCapabilities{cr: cr}, channelPolicyManagerGetter, cor)

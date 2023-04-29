@@ -195,12 +195,12 @@ func (s *StandardChannel) ProcessAttestationMsg(env *cb.Envelope) (attestationRe
 		return nil, 0, err
 	}
 
-	existMessages, err := s.attestationMessagesStorage.Get(message.GetBlockNumber())
+	err = s.attestationMessagesStorage.Add(message.GetBlockNumber(), env)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = s.attestationMessagesStorage.Add(message.GetBlockNumber(), env)
+	existMessages, err := s.attestationMessagesStorage.Get(message.GetBlockNumber())
 	if err != nil {
 		return nil, 0, err
 	}
@@ -208,7 +208,7 @@ func (s *StandardChannel) ProcessAttestationMsg(env *cb.Envelope) (attestationRe
 	trieHeadCounter := s.countTrieHeads(existMessages)
 
 	for trieHead, counter := range trieHeadCounter {
-		if counter > s.getThresholdForAttestationResult() {
+		if counter >= s.getThresholdForAttestationResult() {
 			attestationResult := &cb.AttestationResultEnvelope{
 				BlockNumber:    message.GetBlockNumber(),
 				ChosenTrieHead: []byte(trieHead),

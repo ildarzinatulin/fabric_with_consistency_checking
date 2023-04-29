@@ -96,6 +96,7 @@ type CapabilityProvider interface {
 	Capabilities() channelconfig.ApplicationCapabilities
 }
 
+//go:generate mockery -dir ./ -name AttestationCheckingParametersProvider -case underscore -output mocks/
 type AttestationCheckingParametersProvider interface {
 	AttestationCheckingParameters() channelconfig.AttestationCheckingParameters
 }
@@ -144,7 +145,6 @@ type coordinator struct {
 // NewCoordinator creates a new instance of coordinator
 func NewCoordinator(mspID string, support Support, store *transientstore.Store, selfSignedData protoutil.SignedData, metrics *metrics.PrivdataMetrics,
 	config CoordinatorConfig, idDeserializerFactory IdentityDeserializerFactory, broadcastClient common.BroadcastClient, signer common.Signer) Coordinator {
-
 	return &coordinator{
 		Support:                        support,
 		mspID:                          mspID,
