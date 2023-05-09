@@ -119,3 +119,5 @@ require (
 replace github.com/cespare/xxhash/v2 => github.com/cespare/xxhash/v2 v2.1.2 // fix for Go 1.17 in github.com/prometheus/client_golang dependency without updating protobuf
 
 replace github.com/hyperledger/fabric-protos-go => /Users/ildar/gohack/github.com/hyperledger/fabric-protos-go
+
+replace github.com/hyperledger/fabric-config => /Users/ildar/gohack/github.com/hyperledger/fabric-config

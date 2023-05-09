@@ -633,7 +633,6 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
 	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
 	attestationCheckingParameters.On("EnableChecking").Return(false)
-
 	coordinator := NewCoordinator(mspID, Support{
 		ChainID:                               "testchannelid",
 		CollectionStore:                       cs,
@@ -642,7 +641,7 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Block.Metadata is nil or Block.Metadata lacks a Tx filter bitmap")
@@ -658,7 +657,7 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 		Validator:                             &validatorMock{fmt.Errorf("failed validating block")},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "failed validating block")
@@ -674,7 +673,7 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "block data size")
@@ -730,7 +729,7 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -793,7 +792,7 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -862,7 +861,7 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -986,7 +985,7 @@ func TestCoordinatorToFilterOutPvtRWSetsWithWrongHash(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 
 	fetcher.On("fetch", mock.Anything).expectingDigests([]privdatacommon.DigKey{
 		{
@@ -1113,7 +1112,7 @@ func TestCoordinatorStoreBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1221,7 +1220,7 @@ func TestCoordinatorStoreBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, nil)
 	require.Error(t, err)
 	require.Equal(t, "test error", err.Error())
@@ -1269,7 +1268,7 @@ func TestCoordinatorStoreBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, nil)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1310,7 +1309,7 @@ func TestCoordinatorStoreBlock(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 
 	pvtData = pdFactory.addRWSet().addNSRWSet("ns3", "c3").create()
 	err = coordinator.StoreBlock(block, pvtData)
@@ -1395,7 +1394,7 @@ func TestCoordinatorStoreBlockWhenPvtDataExistInLedger(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, nil, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, nil, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1512,7 +1511,7 @@ func TestProceedWithoutPrivateData(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1592,7 +1591,7 @@ func TestProceedWithInEligiblePrivateData(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, nil, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, nil, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, nil)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1664,7 +1663,7 @@ func TestCoordinatorGetBlocks(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	expectedPrivData := (&pvtDataFactory{}).addRWSet().addNSRWSet("ns1", "c2").create()
 	block2, returnedPrivateData, err := coordinator.GetPvtDataAndBlockByNum(1, peerSelfSignedData)
 	require.NoError(t, err)
@@ -1775,7 +1774,7 @@ func TestPurgeBelowHeight(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, conf, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, conf, idDeserializerFactory, nil)
 
 	hash := util2.ComputeSHA256([]byte("rws-pre-image"))
 	block := bf.AddTxn("tx10", "ns1", hash, "c1").create()
@@ -1827,7 +1826,7 @@ func TestCoordinatorStorePvtData(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, protoutil.SignedData{}, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, protoutil.SignedData{}, metrics, testConfig, idDeserializerFactory, nil)
 	pvtData := (&pvtDataFactory{}).addRWSet().addNSRWSet("ns1", "c1").create()
 	// Green path: ledger height can be retrieved from ledger/committer
 	err := coordinator.StorePvtData("tx1", &tspb.TxPvtReadWriteSetWithConfigInfo{
@@ -1931,7 +1930,7 @@ func TestIgnoreReadOnlyColRWSets(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	// We pass a nil private data slice to indicate no pre-images though the block contains
 	// private data reads.
 	err = coordinator.StoreBlock(block, nil)
@@ -2021,7 +2020,7 @@ func TestCoordinatorMetrics(t *testing.T) {
 		Validator:                             &validatorMock{},
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 
@@ -2128,11 +2127,8 @@ func TestSendingAttestationMessage(t *testing.T) {
 	trie := mpt.New(nil, storage.NewMemoryAdapter())
 	err = trie.Put([]byte("some key"), []byte("some value"))
 	require.NoError(t, err)
-	broadcastClient := &privdatamocks.BroadcastClient{}
-	// broadcastClient.
-	env, err := protoutil.CreateSignedEnvelope(common.HeaderType_ATTESTATION, "testchannelid", nil, &common.AttestationEnvelope{TrieHead: trie.RootHash(), BlockNumber: 1}, 0, 0)
-	require.NoError(t, err)
-	broadcastClient.On("Send", env).Return(nil)
+	attestationMessageSender := &privdatamocks.AttestationMessageSender{}
+	attestationMessageSender.On("Send", uint64(1), trie.RootHash()).Return(nil)
 
 	coordinator := NewCoordinator(mspID, Support{
 		ChainID:                               "testchannelid",
@@ -2143,8 +2139,8 @@ func TestSendingAttestationMessage(t *testing.T) {
 		CapabilityProvider:                    capabilityProvider,
 		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
 		Trie:                                  trie,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, broadcastClient, nil)
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, attestationMessageSender)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
-	broadcastClient.AssertCalled(t, "Send", env)
+	attestationMessageSender.AssertCalled(t, "Send", uint64(1), trie.RootHash())
 }

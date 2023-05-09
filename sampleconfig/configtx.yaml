@@ -247,6 +247,12 @@ Application: &ApplicationDefaults
     Capabilities:
         <<: *ApplicationCapabilities
 
+    AttestationCheckingParameters: &AttestationCheckingParameters
+        EnableChecking: true
+        RequiredNumberOfMessages: 2
+        Frequency: 5
+
+
 ################################################################################
 #
 #   ORDERER

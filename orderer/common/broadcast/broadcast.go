@@ -169,6 +169,7 @@ func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.Broad
 		tracker.EndValidate()
 
 		if attestationResult != nil {
+			logger.Error("Have attestationResult!")
 			tracker.BeginEnqueue()
 			if err = processor.WaitReady(); err != nil {
 				logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s with SERVICE_UNAVAILABLE: rejected by Consenter: %s", chdr.ChannelId, addr, err)

@@ -105,7 +105,7 @@ type Application struct {
 	Capabilities                  map[string]bool               `yaml:"Capabilities"`
 	Policies                      map[string]*Policy            `yaml:"Policies"`
 	ACLs                          map[string]string             `yaml:"ACLs"`
-	AttestationCheckingParameters AttestationCheckingParameters `yaml:"RequiredNumberOfAttestationMessages"`
+	AttestationCheckingParameters AttestationCheckingParameters `yaml:"AttestationCheckingParameters"`
 }
 
 type AttestationCheckingParameters struct {

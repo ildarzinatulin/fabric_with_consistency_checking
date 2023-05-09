@@ -581,6 +581,9 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 	for _, ns := range namespaces {
 		updates := txmgr.currentUpdates.batch.PubUpdates.GetUpdates(ns)
 		for k, vv := range updates {
+			if k == "CHANNEL_CONFIG_ENV_BYTES" {
+				continue
+			}
 			if vv.Value == nil {
 				err := txmgr.stateTrie.Put([]byte(k), nil)
 				if err != nil {
@@ -589,12 +592,7 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 				continue
 			}
 
-			v := make([]byte, 0, len(vv.Metadata)+len(vv.Value)+len(vv.Version.ToBytes()))
-			v = append(v, vv.Metadata...)
-			v = append(v, vv.Value...)
-			v = append(v, vv.Version.ToBytes()...)
-
-			err := txmgr.stateTrie.Put([]byte(k), v)
+			err := txmgr.stateTrie.Put([]byte(k), vv.Value)
 			if err != nil {
 				return err
 			}
@@ -602,7 +600,6 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 	}
 
 	txmgr.stateTrie.Commit()
-
 	return nil
 }
 

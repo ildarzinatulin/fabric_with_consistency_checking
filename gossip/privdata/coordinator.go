@@ -23,7 +23,6 @@ import (
 	"github.com/hyperledger/fabric/gossip/metrics"
 	privdatacommon "github.com/hyperledger/fabric/gossip/privdata/common"
 	"github.com/hyperledger/fabric/gossip/util"
-	"github.com/hyperledger/fabric/internal/peer/common"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
 	"github.com/vldmkr/merkle-patricia-trie/mpt"
@@ -138,13 +137,12 @@ type coordinator struct {
 	pullRetryThreshold             time.Duration
 	skipPullingInvalidTransactions bool
 	idDeserializerFactory          IdentityDeserializerFactory
-	broadcastClient                common.BroadcastClient
-	signer                         common.Signer
+	attestationMessageSender       AttestationMessageSender
 }
 
 // NewCoordinator creates a new instance of coordinator
 func NewCoordinator(mspID string, support Support, store *transientstore.Store, selfSignedData protoutil.SignedData, metrics *metrics.PrivdataMetrics,
-	config CoordinatorConfig, idDeserializerFactory IdentityDeserializerFactory, broadcastClient common.BroadcastClient, signer common.Signer) Coordinator {
+	config CoordinatorConfig, idDeserializerFactory IdentityDeserializerFactory, attestationMessageSender AttestationMessageSender) Coordinator {
 	return &coordinator{
 		Support:                        support,
 		mspID:                          mspID,
@@ -156,20 +154,12 @@ func NewCoordinator(mspID string, support Support, store *transientstore.Store, 
 		pullRetryThreshold:             config.PullRetryThreshold,
 		skipPullingInvalidTransactions: config.SkipPullingInvalidTransactions,
 		idDeserializerFactory:          idDeserializerFactory,
-		broadcastClient:                broadcastClient,
-		signer:                         signer,
+		attestationMessageSender:       attestationMessageSender,
 	}
 }
 
 // StoreBlock stores block with private data into the ledger
 func (c *coordinator) StoreBlock(block *cb.Block, privateDataSets util.PvtDataCollections) error {
-	if c.shouldSendAttestationMessage(block) {
-		err := c.sendAttestationMessage(block.Header.GetNumber())
-		if err != nil {
-			return err
-		}
-	}
-
 	if block.Data == nil {
 		return errors.New("Block data is empty")
 	}
@@ -178,6 +168,13 @@ func (c *coordinator) StoreBlock(block *cb.Block, privateDataSets util.PvtDataCo
 	}
 
 	c.logger.Infof("Received block [%d] from buffer", block.Header.Number)
+
+	if c.shouldSendAttestationMessage(block) {
+		err := c.sendAttestationMessage(block.Header.GetNumber())
+		if err != nil {
+			return err
+		}
+	}
 
 	c.logger.Debugf("Validating block [%d]", block.Header.Number)
 
@@ -269,14 +266,12 @@ func (c *coordinator) sendAttestationMessage(lastBlockNumber uint64) error {
 	}
 
 	trieHead := c.Support.Trie.RootHash()
-
-	env, err := protoutil.CreateSignedEnvelope(cb.HeaderType_ATTESTATION, c.ChainID, c.signer, &cb.AttestationEnvelope{TrieHead: trieHead, BlockNumber: lastBlockNumber}, 0, 0)
-	if err != nil {
-		c.logger.Errorf("Error while getting trie head %s", err)
-		return err
+	if trieHead == nil {
+		c.logger.Errorf("Trie head is nil for block %d", lastBlockNumber)
+		return nil
 	}
 
-	return c.broadcastClient.Send(env)
+	return c.attestationMessageSender.Send(lastBlockNumber, trieHead)
 }
 
 // StorePvtData used to persist private data into transient store

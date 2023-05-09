@@ -30,7 +30,6 @@ import (
 	"github.com/hyperledger/fabric/gossip/protoext"
 	"github.com/hyperledger/fabric/gossip/state"
 	"github.com/hyperledger/fabric/gossip/util"
-	peercommon "github.com/hyperledger/fabric/internal/peer/common"
 	corecomm "github.com/hyperledger/fabric/internal/pkg/comm"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
 	"github.com/hyperledger/fabric/internal/pkg/peer/blocksprovider"
@@ -348,10 +347,8 @@ func (g *GossipService) InitializeChannel(channelID string, ordererSource *order
 	}
 	selfSignedData := g.createSelfSignedData()
 	mspID := string(g.secAdv.OrgByPeerIdentity(selfSignedData.Identity))
-	broadcastClient, err := peercommon.GetBroadcastClient()
-	if err != nil {
-		logger.Errorf("Error while creating broadcast client for channel %s: %s", channelID, err)
-	}
+
+	attestationMessageSender := gossipprivdata.NewAttestationMessageSender(channelID, g.signer, ordererSource)
 
 	coordinator := gossipprivdata.NewCoordinator(mspID, gossipprivdata.Support{
 		ChainID:                               channelID,
@@ -363,7 +360,7 @@ func (g *GossipService) InitializeChannel(channelID string, ordererSource *order
 		Trie:                                  support.StateTrie,
 		AttestationCheckingParametersProvider: support.AttestationCheckingParametersProvider,
 	}, store, selfSignedData, g.metrics.PrivdataMetrics, coordinatorConfig,
-		support.IdDeserializeFactory, broadcastClient, g.signer)
+		support.IdDeserializeFactory, attestationMessageSender)
 
 	var reconciler gossipprivdata.PvtDataReconciler
 

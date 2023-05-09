@@ -433,21 +433,25 @@ func (v *TxValidator) validateTx(req *blockValidationRequest, results chan<- *bl
 			attestationResult := &common.AttestationResultEnvelope{}
 			err = proto.Unmarshal(payload.Data, attestationResult)
 			if err != nil {
-				logger.Criticalf("Error while unmarshaling attestation result message for channel %s, error: %s", v.ChannelID, err)
+				logger.Errorf("Error while unmarshaling attestation result message for channel %s, error: %s", v.ChannelID, err)
 				return
 			}
 
 			if !v.checkProof(attestationResult.Proof, attestationResult.ChosenTrieHead, attestationResult.GetBlockNumber()) {
-				logger.Criticalf("Chosen trie head is not correct for block number: %d channel: %s", attestationResult.GetBlockNumber(), v.ChannelID)
+				logger.Errorf("Chosen trie head is not correct for block number: %d channel: %s", attestationResult.GetBlockNumber(), v.ChannelID)
 			}
 
 			if v.StateTrieStorage.Has(attestationResult.ChosenTrieHead) {
-				logger.Debugf("Successful validation of an attestation result")
+				logger.Info("Successful validation of an attestation result")
 			} else {
-				logger.Criticalf("There is no trie head for block number: %d channel: %s", attestationResult.GetBlockNumber(), v.ChannelID)
+				logger.Errorf("There is no trie head for block number: %d channel: %s", attestationResult.GetBlockNumber(), v.ChannelID)
+			}
+
+			results <- &blockValidationResult{
+				tIdx: tIdx,
+				txid: txID,
 			}
 			return
-
 		} else {
 			logger.Warningf("Unknown transaction type [%s] in block number [%d] transaction index [%d]",
 				common.HeaderType(chdr.Type), block.Header.Number, tIdx)

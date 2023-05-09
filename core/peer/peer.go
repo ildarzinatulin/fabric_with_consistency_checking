@@ -88,7 +88,7 @@ func (p *Peer) updateTrustedRoots(cm channelconfig.Resources) {
 	if !p.ServerConfig.SecOpts.UseTLS {
 		return
 	}
-
+	p.ServerConfig.SecOpts.TLSConfig()
 	// this is triggered on per channel basis so first update the roots for the channel
 	peerLogger.Debugf("Updating trusted root authorities for channel %s", cm.ConfigtxValidator().ChannelID())
 
