@@ -348,7 +348,10 @@ func (g *GossipService) InitializeChannel(channelID string, ordererSource *order
 	selfSignedData := g.createSelfSignedData()
 	mspID := string(g.secAdv.OrgByPeerIdentity(selfSignedData.Identity))
 
-	attestationMessageSender := gossipprivdata.NewAttestationMessageSender(channelID, g.signer, ordererSource)
+	var attestationMessageSender gossipprivdata.AttestationMessageSender
+	if support.AttestationCheckingParametersProvider.AttestationCheckingParameters().EnableChecking() {
+		attestationMessageSender = gossipprivdata.NewAttestationMessageSender(channelID, g.signer, ordererSource)
+	}
 
 	coordinator := gossipprivdata.NewCoordinator(mspID, gossipprivdata.Support{
 		ChainID:                               channelID,

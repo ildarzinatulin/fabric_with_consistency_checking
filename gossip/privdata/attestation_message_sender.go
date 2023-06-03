@@ -25,11 +25,34 @@ type AttestationMessageSender interface {
 }
 
 func NewAttestationMessageSender(chainID string, signer common.Signer, ordererSource *orderers.ConnectionSource) AttestationMessageSender {
+	endpoint, err := ordererSource.RandomEndpoint()
+	if err != nil {
+		logger.Errorf("Error while getting orderer endpoint for channel %s: %s", chainID, err)
+	}
+
+	config := deliverservice.GlobalConfig()
+	cc := comm.ClientConfig{
+		DialTimeout: config.ConnectionTimeout,
+		KaOpts:      config.KeepaliveOptions,
+		SecOpts:     config.SecOpts,
+	}
+	cc.SecOpts.ServerRootCAs = endpoint.RootCerts
+	conn, err := cc.Dial(endpoint.Address)
+	if err != nil {
+		logger.Errorf("Error while dial for channel %s: %s", chainID, err)
+	}
+
+	broadcastClient, err := orderer.NewAtomicBroadcastClient(conn).Broadcast(context.TODO())
+	if err != nil {
+		logger.Errorf("Error while creating AtomicBroadcastClient for channel %s: %s", chainID, err)
+	}
+
 	return &attestationMessageSender{
-		chainID:       chainID,
-		logger:        logger.With("channel", chainID),
-		signer:        signer,
-		ordererSource: ordererSource,
+		chainID:         chainID,
+		logger:          logger.With("channel", chainID),
+		signer:          signer,
+		ordererSource:   ordererSource,
+		broadcastClient: broadcastClient,
 	}
 }
 
@@ -44,12 +67,6 @@ type attestationMessageSender struct {
 func (s *attestationMessageSender) Send(blockNUmber uint64, mptHead []byte) error {
 	s.logger.Error("Sending attestation message")
 
-	if !s.tryInitBroadcastClient() {
-		s.logger.Error("Broadcast client not yet created for attestation messages")
-		return nil
-	}
-	s.logger.Debug("Broadcast client was created for attestation messages")
-
 	env, err := protoutil.CreateSignedEnvelope(cb.HeaderType_ATTESTATION, s.chainID, s.signer, &cb.AttestationEnvelope{TrieHead: mptHead, BlockNumber: blockNUmber}, 0, 0)
 	if err != nil {
 		s.logger.Errorf("Error while creating envelope for attestation: %s", err)
@@ -58,39 +75,4 @@ func (s *attestationMessageSender) Send(blockNUmber uint64, mptHead []byte) erro
 
 	s.logger.Debug("Sending attestation message is finished")
 	return s.broadcastClient.Send(env)
-}
-
-func (s *attestationMessageSender) tryInitBroadcastClient() bool {
-	if s.broadcastClient != nil {
-		return true
-	}
-
-	endpoint, err := s.ordererSource.RandomEndpoint()
-	if err != nil {
-		logger.Errorf("Error while getting orderer endpoint for channel %s: %s", s.chainID, err)
-		return false
-	}
-
-	config := deliverservice.GlobalConfig()
-	cc := comm.ClientConfig{
-		DialTimeout: config.ConnectionTimeout,
-		KaOpts:      config.KeepaliveOptions,
-		SecOpts:     config.SecOpts,
-	}
-	cc.SecOpts.ServerRootCAs = endpoint.RootCerts
-	conn, err := cc.Dial(endpoint.Address)
-	if err != nil {
-		logger.Errorf("Error while dial for channel %s: %s", s.chainID, err)
-		return false
-	}
-
-	broadcastClient, err := orderer.NewAtomicBroadcastClient(conn).Broadcast(context.TODO())
-	if err != nil {
-		logger.Errorf("Error while creating AtomicBroadcastClient for channel %s: %s", s.chainID, err)
-		return false
-	}
-
-	s.broadcastClient = broadcastClient
-
-	return true
 }

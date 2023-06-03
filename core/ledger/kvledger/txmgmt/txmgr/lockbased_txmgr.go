@@ -31,6 +31,10 @@ import (
 	"github.com/vldmkr/merkle-patricia-trie/storage"
 )
 
+const (
+	channelConfigKey = "CHANNEL_CONFIG_ENV_BYTES"
+)
+
 var logger = flogging.MustGetLogger("lockbasedtxmgr")
 
 // LockBasedTxMgr a simple implementation of interface `txmgmt.TxMgr`.
@@ -577,11 +581,13 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 		return nil
 	}
 
+	logger.Error("updateStateTrie")
+
 	namespaces := txmgr.currentUpdates.batch.PubUpdates.GetUpdatedNamespaces()
 	for _, ns := range namespaces {
 		updates := txmgr.currentUpdates.batch.PubUpdates.GetUpdates(ns)
 		for k, vv := range updates {
-			if k == "CHANNEL_CONFIG_ENV_BYTES" {
+			if k == channelConfigKey {
 				continue
 			}
 			if vv.Value == nil {

@@ -551,11 +551,17 @@ func (flbs fileLedgerBlockStore) RetrieveBlockByNumber(blockNum uint64) (*common
 // TrieBundle TODO: move in a separate package
 type TrieBundle struct {
 	trie    *mpt.Trie
-	storage *storage.LevelDBAdapter
+	storage storage.StorageAdapter
 }
 
 // InitStateTrie TODO: may be it is better to init trie while ledger initialization?
 func (p *Peer) InitStateTrie(ledgerId string) (TrieBundle, error) {
+	/*return TrieBundle{
+		trie:    nil,
+		storage: nil,
+	}, nil*/
+
+	//trieStorage := storage.NewMemoryAdapter()
 	trieStorage, err := storage.NewLevelDBAdapter("/mptDB/peer/" + ledgerId)
 	if err != nil {
 		logger.Errorf("Error while init level db in /mptDB/peer/%s: %s", ledgerId, err)
