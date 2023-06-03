@@ -8,6 +8,7 @@ package txmgr
 
 import (
 	"bytes"
+	"encoding/binary"
 	"sync"
 
 	"github.com/golang/protobuf/proto"
@@ -583,6 +584,7 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 
 	logger.Error("updateStateTrie")
 
+	mptForBatch := mpt.New(nil, storage.NewMemoryAdapter())
 	namespaces := txmgr.currentUpdates.batch.PubUpdates.GetUpdatedNamespaces()
 	for _, ns := range namespaces {
 		updates := txmgr.currentUpdates.batch.PubUpdates.GetUpdates(ns)
@@ -591,20 +593,25 @@ func (txmgr *LockBasedTxMgr) updateStateTrie() error {
 				continue
 			}
 			if vv.Value == nil {
-				err := txmgr.stateTrie.Put([]byte(k), nil)
+				err := mptForBatch.Put([]byte(k), nil)
 				if err != nil {
 					return err
 				}
 				continue
 			}
-
-			err := txmgr.stateTrie.Put([]byte(k), vv.Value)
+			err := mptForBatch.Put([]byte(k), nil)
 			if err != nil {
 				return err
 			}
 		}
 	}
 
+	key := make([]byte, 8)
+	binary.LittleEndian.PutUint64(key, txmgr.currentUpdates.blockNum())
+	err := txmgr.stateTrie.Put(key, mptForBatch.RootHash())
+	if err != nil {
+		return err
+	}
 	txmgr.stateTrie.Commit()
 	return nil
 }
