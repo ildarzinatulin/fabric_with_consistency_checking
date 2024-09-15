@@ -15,6 +15,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
+	"github.com/vldmkr/merkle-patricia-trie/storage"
+
 	pb "github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-protos-go/common"
 	proto "github.com/hyperledger/fabric-protos-go/gossip"
@@ -626,14 +629,19 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Block.Metadata is nil or Block.Metadata lacks a Tx filter bitmap")
@@ -642,13 +650,14 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 	block = bf.create()
 	pvtData = pdFactory.create()
 	coordinator = NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{fmt.Errorf("failed validating block")},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{fmt.Errorf("failed validating block")},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "failed validating block")
@@ -657,13 +666,14 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 	block = bf.withMetadataSize(100).create()
 	pvtData = pdFactory.create()
 	coordinator = NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "block data size")
@@ -712,13 +722,14 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(false)
 	coordinator = NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -774,13 +785,14 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 		AvailableElements: nil,
 	}, nil)
 	coordinator = NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -842,13 +854,14 @@ func TestCoordinatorStoreInvalidBlock(t *testing.T) {
 	pvtData = pdFactory.addRWSet().addNSRWSet("ns1", "c1", "c2").create()
 	committer.On("DoesPvtDataInfoExistInLedger", mock.Anything).Return(false, nil)
 	coordinator = NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -960,14 +973,19 @@ func TestCoordinatorToFilterOutPvtRWSetsWithWrongHash(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 
 	fetcher.On("fetch", mock.Anything).expectingDigests([]privdatacommon.DigKey{
 		{
@@ -1082,14 +1100,19 @@ func TestCoordinatorStoreBlock(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1190,13 +1213,14 @@ func TestCoordinatorStoreBlock(t *testing.T) {
 	mockCs := &privdatamocks.CollectionStore{}
 	mockCs.On("RetrieveCollectionConfig", mock.Anything).Return(nil, errors.New("test error"))
 	coordinator = NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    mockCs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       mockCs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, nil)
 	require.Error(t, err)
 	require.Equal(t, "test error", err.Error())
@@ -1237,13 +1261,14 @@ func TestCoordinatorStoreBlock(t *testing.T) {
 	}).Return(nil)
 	committer.On("DoesPvtDataInfoExistInLedger", mock.Anything).Return(false, nil)
 	coordinator = NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, nil)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1277,13 +1302,14 @@ func TestCoordinatorStoreBlock(t *testing.T) {
 	}).Return(nil)
 	committer.On("DoesPvtDataInfoExistInLedger", mock.Anything).Return(false, nil)
 	coordinator = NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 
 	pvtData = pdFactory.addRWSet().addNSRWSet("ns3", "c3").create()
 	err = coordinator.StoreBlock(block, pvtData)
@@ -1356,14 +1382,19 @@ func TestCoordinatorStoreBlockWhenPvtDataExistInLedger(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    nil,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, nil, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       nil,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, nil, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1468,14 +1499,19 @@ func TestProceedWithoutPrivateData(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1543,14 +1579,19 @@ func TestProceedWithInEligiblePrivateData(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            nil,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, nil, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               nil,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, nil, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, nil)
 	require.NoError(t, err)
 	assertCommitHappened()
@@ -1610,14 +1651,19 @@ func TestCoordinatorGetBlocks(t *testing.T) {
 		PvtData: expectedCommittedPrivateData1,
 	}, nil)
 	committer.On("DoesPvtDataInfoExistInLedger", mock.Anything).Return(false, nil)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	expectedPrivData := (&pvtDataFactory{}).addRWSet().addNSRWSet("ns1", "c2").create()
 	block2, returnedPrivateData, err := coordinator.GetPvtDataAndBlockByNum(1, peerSelfSignedData)
 	require.NoError(t, err)
@@ -1716,14 +1762,19 @@ func TestPurgeBelowHeight(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, conf, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, conf, idDeserializerFactory, nil)
 
 	hash := util2.ComputeSHA256([]byte("rws-pre-image"))
 	block := bf.AddTxn("tx10", "ns1", hash, "c1").create()
@@ -1763,14 +1814,19 @@ func TestCoordinatorStorePvtData(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, protoutil.SignedData{}, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, protoutil.SignedData{}, metrics, testConfig, idDeserializerFactory, nil)
 	pvtData := (&pvtDataFactory{}).addRWSet().addNSRWSet("ns1", "c1").create()
 	// Green path: ledger height can be retrieved from ledger/committer
 	err := coordinator.StorePvtData("tx1", &tspb.TxPvtReadWriteSetWithConfigInfo{
@@ -1862,14 +1918,19 @@ func TestIgnoreReadOnlyColRWSets(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	// We pass a nil private data slice to indicate no pre-images though the block contains
 	// private data reads.
 	err = coordinator.StoreBlock(block, nil)
@@ -1947,14 +2008,19 @@ func TestCoordinatorMetrics(t *testing.T) {
 	appCapability := &privdatamocks.ApplicationCapabilities{}
 	capabilityProvider.On("Capabilities").Return(appCapability)
 	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(false)
 	coordinator := NewCoordinator(mspID, Support{
-		ChainID:            "testchannelid",
-		CollectionStore:    cs,
-		Committer:          committer,
-		Fetcher:            fetcher,
-		Validator:          &validatorMock{},
-		CapabilityProvider: capabilityProvider,
-	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory)
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, nil)
 	err = coordinator.StoreBlock(block, pvtData)
 	require.NoError(t, err)
 
@@ -1990,4 +2056,91 @@ func TestCoordinatorMetrics(t *testing.T) {
 		return testMetricProvider.FakePurgeDuration.ObserveArgsForCall(0) > 0
 	}
 	require.Eventually(t, purgeDuration, 2*time.Second, 100*time.Millisecond)
+}
+
+func TestSendingAttestationMessage(t *testing.T) {
+	err := msptesttools.LoadMSPSetupForTesting()
+	require.NoError(t, err, fmt.Sprintf("Failed to setup local msp for testing, got err %s", err))
+	identity, err := mspmgmt.GetLocalMSP(factory.GetDefault()).GetDefaultSigningIdentity()
+	require.NoError(t, err)
+	serializedID, err := identity.Serialize()
+	require.NoError(t, err, fmt.Sprintf("Serialize should have succeeded, got err %s", err))
+	data := []byte{1, 2, 3}
+	signature, err := identity.Sign(data)
+	require.NoError(t, err, fmt.Sprintf("Could not sign identity, got err %s", err))
+	mspID := "Org1MSP"
+	peerSelfSignedData := protoutil.SignedData{
+		Identity:  serializedID,
+		Signature: signature,
+		Data:      data,
+	}
+
+	cs := createcollectionStore(peerSelfSignedData).thatAcceptsAll().withMSPIdentity(identity.GetMSPIdentifier())
+
+	committer := &privdatamocks.Committer{}
+	committer.On("CommitLegacy", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		privateDataPassed2Ledger := args.Get(0).(*ledger.BlockAndPvtData).PvtData
+		require.True(t, reflect.DeepEqual(flattenTxPvtDataMap(privateDataPassed2Ledger),
+			flattenTxPvtDataMap(expectedCommittedPrivateData1)))
+
+		commitOpts := args.Get(1).(*ledger.CommitOptions)
+		expectedCommitOpts := &ledger.CommitOptions{FetchPvtDataFromLedger: false}
+		require.Equal(t, expectedCommitOpts, commitOpts)
+	}).Return(nil)
+
+	store := newTransientStore(t)
+	defer store.tearDown()
+
+	fetcher := &fetcherMock{t: t}
+
+	hash := util2.ComputeSHA256([]byte("rws-pre-image"))
+	pdFactory := &pvtDataFactory{}
+	bf := &blockFactory{
+		channelID: "testchannelid",
+	}
+
+	idDeserializerFactory := IdentityDeserializerFactoryFunc(func(chainID string) msp.IdentityDeserializer {
+		return mspmgmt.GetManagerForChain("testchannelid")
+	})
+
+	block := bf.AddTxnWithEndorsement("tx1", "ns1", hash, "org1", true, "c1", "c2").
+		AddTxnWithEndorsement("tx2", "ns2", hash, "org2", true, "c1").create()
+
+	metrics := metrics.NewGossipMetrics(&disabled.Provider{}).PrivdataMetrics
+
+	fmt.Println("Scenario I")
+	// Scenario I: Block we got has sufficient private data alongside it.
+	// If the coordinator tries fetching from the transientstore, or peers it would result in panic,
+	// because we didn't define yet the "On(...)" invocation of the transient store or other peers.
+	pvtData := pdFactory.addRWSet().addNSRWSet("ns1", "c1", "c2").addRWSet().addNSRWSet("ns2", "c1").create()
+	committer.On("DoesPvtDataInfoExistInLedger", mock.Anything).Return(false, nil)
+
+	capabilityProvider := &privdatamocks.CapabilityProvider{}
+	appCapability := &privdatamocks.ApplicationCapabilities{}
+	capabilityProvider.On("Capabilities").Return(appCapability)
+	appCapability.On("StorePvtDataOfInvalidTx").Return(true)
+	attestationCheckingParametersProvider := &privdatamocks.AttestationCheckingParametersProvider{}
+	attestationCheckingParameters := &privdatamocks.AttestationCheckingParameters{}
+	attestationCheckingParametersProvider.On("AttestationCheckingParameters").Return(attestationCheckingParameters)
+	attestationCheckingParameters.On("EnableChecking").Return(true)
+	attestationCheckingParameters.On("Frequency").Return(uint32(1))
+	trie := mpt.New(nil, storage.NewMemoryAdapter())
+	err = trie.Put([]byte("some key"), []byte("some value"))
+	require.NoError(t, err)
+	attestationMessageSender := &privdatamocks.AttestationMessageSender{}
+	attestationMessageSender.On("Send", uint64(1), trie.RootHash()).Return(nil)
+
+	coordinator := NewCoordinator(mspID, Support{
+		ChainID:                               "testchannelid",
+		CollectionStore:                       cs,
+		Committer:                             committer,
+		Fetcher:                               fetcher,
+		Validator:                             &validatorMock{},
+		CapabilityProvider:                    capabilityProvider,
+		AttestationCheckingParametersProvider: attestationCheckingParametersProvider,
+		Trie:                                  trie,
+	}, store.store, peerSelfSignedData, metrics, testConfig, idDeserializerFactory, attestationMessageSender)
+	err = coordinator.StoreBlock(block, pvtData)
+	require.NoError(t, err)
+	attestationMessageSender.AssertCalled(t, "Send", uint64(1), trie.RootHash())
 }

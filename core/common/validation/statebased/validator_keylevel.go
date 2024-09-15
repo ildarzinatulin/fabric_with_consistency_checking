@@ -194,6 +194,12 @@ func (klv *KeyLevelValidator) extractDependenciesForTx(blockNum, txNum uint64, e
 		return
 	}
 
+	chdr, _ := protoutil.UnmarshalChannelHeader(payl.Header.GetChannelHeader())
+	if common.HeaderType(chdr.Type) == common.HeaderType_ATTESTATION_RESULT {
+		klv.vpmgr.ExtractValidationParameterDependency(blockNum, txNum, []byte{})
+		return
+	}
+
 	tx, err := protoutil.UnmarshalTransaction(payl.Data)
 	if err != nil {
 		logger.Warningf("while executing GetTransaction got error '%s', skipping tx at height (%d,%d)", err, blockNum, txNum)

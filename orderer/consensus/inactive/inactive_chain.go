@@ -26,6 +26,10 @@ func (c *Chain) Configure(_ *common.Envelope, _ uint64) error {
 	return c.Err
 }
 
+func (c *Chain) SendAttestationResult(_ *common.Envelope, _ uint64) error {
+	return c.Err
+}
+
 func (c *Chain) WaitReady() error {
 	return c.Err
 }

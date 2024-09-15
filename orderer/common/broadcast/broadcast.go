@@ -48,6 +48,8 @@ type Consenter interface {
 	// It ultimately passes through to the consensus.Chain interface
 	Configure(config *cb.Envelope, configSeq uint64) error
 
+	SendAttestationResult(attestationResult *cb.Envelope, configSeq uint64) error
+
 	// WaitReady blocks waiting for consenter to be ready for accepting new messages.
 	// This is useful when consenter needs to temporarily block ingress messages so
 	// that in-flight messages can be consumed. It could return error if consenter is
@@ -156,7 +158,32 @@ func (bh *Handler) ProcessMessage(msg *cb.Envelope, addr string) (resp *ab.Broad
 		return &ab.BroadcastResponse{Status: cb.Status_BAD_REQUEST, Info: err.Error()}
 	}
 
-	if !isConfig {
+	if chdr.Type == int32(cb.HeaderType_ATTESTATION) {
+		logger.Debugf("[channel: %s] Broadcast is processing attestation message from %s", chdr.ChannelId, addr)
+
+		attestationResult, configSeq, err := processor.ProcessAttestationMsg(msg)
+		if err != nil {
+			logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s because of error: %s", chdr.ChannelId, addr, err)
+			return &ab.BroadcastResponse{Status: ClassifyError(err), Info: err.Error()}
+		}
+		tracker.EndValidate()
+
+		if attestationResult != nil {
+			logger.Error("Have attestationResult!")
+			tracker.BeginEnqueue()
+			if err = processor.WaitReady(); err != nil {
+				logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s with SERVICE_UNAVAILABLE: rejected by Consenter: %s", chdr.ChannelId, addr, err)
+				return &ab.BroadcastResponse{Status: cb.Status_SERVICE_UNAVAILABLE, Info: err.Error()}
+			}
+
+			err = processor.SendAttestationResult(attestationResult, configSeq)
+			if err != nil {
+				logger.Warningf("[channel: %s] Rejecting broadcast of attestation message from %s with SERVICE_UNAVAILABLE: rejected by Configure: %s", chdr.ChannelId, addr, err)
+				return &ab.BroadcastResponse{Status: cb.Status_SERVICE_UNAVAILABLE, Info: err.Error()}
+			}
+		}
+
+	} else if !isConfig {
 		logger.Debugf("[channel: %s] Broadcast is processing normal message from %s with txid '%s' of type %s", chdr.ChannelId, addr, chdr.TxId, cb.HeaderType_name[chdr.Type])
 
 		configSeq, err := processor.ProcessNormalMsg(msg)

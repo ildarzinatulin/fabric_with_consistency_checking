@@ -27,7 +27,7 @@ func TestUnjoinChannel(t *testing.T) {
 
 	genesisBlock, err := configtxtest.MakeGenesisBlock(ledgerID)
 	require.NoError(t, err)
-	_, err = provider.CreateFromGenesisBlock(genesisBlock)
+	_, err = provider.CreateFromGenesisBlock(genesisBlock, nil)
 	require.NoError(t, err)
 
 	activeLedgerIDs, err = provider.List()
@@ -63,7 +63,7 @@ func TestUnjoinUnjoinedChannelErrors(t *testing.T) {
 	provider := testutilNewProvider(conf, t, &mock.DeployedChaincodeInfoProvider{})
 	genesisBlock, err := configtxtest.MakeGenesisBlock(ledgerID)
 	require.NoError(t, err)
-	_, err = provider.CreateFromGenesisBlock(genesisBlock)
+	_, err = provider.CreateFromGenesisBlock(genesisBlock, nil)
 	require.NoError(t, err)
 	provider.Close()
 
@@ -90,7 +90,7 @@ func TestUnjoinWithRunningPeerErrors(t *testing.T) {
 
 	ledgerID := constructTestLedgerID(1)
 	genesisBlock, _ := configtxtest.MakeGenesisBlock(ledgerID)
-	_, err := provider.CreateFromGenesisBlock(genesisBlock)
+	_, err := provider.CreateFromGenesisBlock(genesisBlock, nil)
 	require.NoError(t, err)
 
 	// Fail when provider is open (e.g. peer is running)
@@ -115,7 +115,7 @@ func TestUnjoinChannelWithInvalidMetadataErrors(t *testing.T) {
 
 	ledgerID := constructTestLedgerID(99)
 	genesisBlock, _ := configtxtest.MakeGenesisBlock(ledgerID)
-	_, err := provider.CreateFromGenesisBlock(genesisBlock)
+	_, err := provider.CreateFromGenesisBlock(genesisBlock, nil)
 	require.NoError(t, err)
 
 	// purposely set an invalid metatdata

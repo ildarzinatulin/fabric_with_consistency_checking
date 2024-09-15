@@ -13,9 +13,8 @@ import (
 	"github.com/hyperledger/fabric/common/channelconfig"
 	"github.com/hyperledger/fabric/common/policies"
 	"github.com/hyperledger/fabric/internal/pkg/identity"
-	"github.com/hyperledger/fabric/protoutil"
-
 	"github.com/hyperledger/fabric/orderer/common/localconfig"
+	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
 )
 
@@ -41,21 +40,25 @@ type StandardChannelSupport interface {
 	ProposeConfigUpdate(configtx *cb.Envelope) (*cb.ConfigEnvelope, error)
 
 	OrdererConfig() (channelconfig.Orderer, bool)
+
+	ApplicationConfig() (channelconfig.Application, bool)
 }
 
 // StandardChannel implements the Processor interface for standard extant channels
 type StandardChannel struct {
-	support           StandardChannelSupport
-	filters           *RuleSet // Rules applicable to both normal and config messages
-	maintenanceFilter Rule     // Rule applicable only to config messages
+	support                    StandardChannelSupport
+	filters                    *RuleSet // Rules applicable to both normal and config messages
+	maintenanceFilter          Rule     // Rule applicable only to config messages
+	attestationMessagesStorage AttestationMessageStorage
 }
 
 // NewStandardChannel creates a new standard message processor
-func NewStandardChannel(support StandardChannelSupport, filters *RuleSet, bccsp bccsp.BCCSP) *StandardChannel {
+func NewStandardChannel(support StandardChannelSupport, filters *RuleSet, bccsp bccsp.BCCSP, attestationMessagesStorage AttestationMessageStorage) *StandardChannel {
 	return &StandardChannel{
-		filters:           filters,
-		support:           support,
-		maintenanceFilter: NewMaintenanceFilter(support, bccsp),
+		filters:                    filters,
+		support:                    support,
+		maintenanceFilter:          NewMaintenanceFilter(support, bccsp),
+		attestationMessagesStorage: attestationMessagesStorage,
 	}
 }
 
@@ -90,6 +93,8 @@ func (s *StandardChannel) ClassifyMsg(chdr *cb.ChannelHeader) Classification {
 	case int32(cb.HeaderType_CONFIG):
 		// In order to maintain backwards compatibility, we must classify these messages
 		return ConfigMsg
+	case int32(cb.HeaderType_ATTESTATION):
+		return AttestationMsg
 	default:
 		return NormalMsg
 	}
@@ -168,4 +173,93 @@ func (s *StandardChannel) ProcessConfigMsg(env *cb.Envelope) (config *cb.Envelop
 	}
 
 	return s.ProcessConfigUpdateMsg(configEnvelope.LastUpdate)
+}
+
+func (s *StandardChannel) ProcessAttestationMsg(env *cb.Envelope) (attestationResultEnv *cb.Envelope, configSeq uint64, err error) {
+	logger.Debugf("Processing attestation message for channel %s", s.support.ChannelID())
+
+	if !s.attestationCheckingEnabled() {
+		logger.Info("attestation checking disabled")
+		return nil, 0, nil
+	}
+
+	if s.attestationMessagesStorage == nil {
+		logger.Warning("attestation messages storage is not init")
+		return nil, 0, nil
+	}
+
+	message := &cb.AttestationEnvelope{}
+	_, err = protoutil.UnmarshalEnvelopeOfType(env, cb.HeaderType_ATTESTATION, message)
+	if err != nil {
+		logger.Warningf("error while unmarshaling attestation message: %s", err)
+		return nil, 0, err
+	}
+
+	err = s.attestationMessagesStorage.Add(message.GetBlockNumber(), env)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	existMessages, err := s.attestationMessagesStorage.Get(message.GetBlockNumber())
+	if err != nil {
+		return nil, 0, err
+	}
+
+	trieHeadCounter := s.countTrieHeads(existMessages)
+
+	for trieHead, counter := range trieHeadCounter {
+		if counter >= s.getThresholdForAttestationResult() {
+			attestationResult := &cb.AttestationResultEnvelope{
+				BlockNumber:    message.GetBlockNumber(),
+				ChosenTrieHead: []byte(trieHead),
+				Proof:          s.createProof(existMessages),
+			}
+
+			attestationResultEnv, err = protoutil.CreateSignedEnvelope(cb.HeaderType_ATTESTATION_RESULT, s.support.ChannelID(), s.support.Signer(), attestationResult, 0, 0)
+			if err != nil {
+				logger.Errorf("Error while creating attestation result envelope %s", err)
+				return nil, 0, err
+			}
+			return attestationResultEnv, s.support.Sequence(), nil
+		}
+	}
+
+	return nil, 0, nil
+}
+
+func (s *StandardChannel) createProof(messages []cb.Envelope) []*cb.Envelope {
+	result := make([]*cb.Envelope, len(messages))
+	for i := range messages {
+		result[i] = &messages[i]
+	}
+	return result
+}
+
+func (s *StandardChannel) attestationCheckingEnabled() bool {
+	config, exist := s.support.ApplicationConfig()
+	if exist {
+		return config.AttestationCheckingParameters().EnableChecking()
+	}
+	return false
+}
+
+func (s *StandardChannel) getThresholdForAttestationResult() uint32 {
+	config, exist := s.support.ApplicationConfig()
+	if exist {
+		return config.AttestationCheckingParameters().RequiredNumberOfMessages()
+	}
+	return 0
+}
+
+func (s *StandardChannel) countTrieHeads(messages []cb.Envelope) map[string]uint32 {
+	trieHeadCounter := make(map[string]uint32)
+	for i := range messages {
+		message := &cb.AttestationEnvelope{}
+		_, err := protoutil.UnmarshalEnvelopeOfType(&messages[i], cb.HeaderType_ATTESTATION, message)
+		if err != nil {
+			logger.Warningf("error while unmarshaling attestation message: %s", err)
+		}
+		trieHeadCounter[string(message.TrieHead)] += 1
+	}
+	return trieHeadCounter
 }

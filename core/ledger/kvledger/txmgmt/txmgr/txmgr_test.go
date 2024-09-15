@@ -1733,3 +1733,42 @@ func testTxSimulatorWithPrivateDataStateBasedEndorsement(t *testing.T, env testE
 	metadata.Add(ns, coll, "key1", sbe2)
 	require.Equal(t, metadata, simRes3.WritesetMetadata)
 }
+
+func TestStateTrie(t *testing.T) {
+	for _, testEnv := range testEnvs {
+		t.Run(testEnv.getName(), func(t *testing.T) {
+			testLedgerID := "testtrie"
+			testEnv.init(t, testLedgerID, nil)
+			testStateTrie(t, testEnv)
+			testEnv.cleanup()
+		})
+	}
+}
+
+func testStateTrie(t *testing.T, env testEnv) {
+	txMgr := env.getTxMgr()
+	txMgrHelper := newTxMgrTestHelper(t, txMgr)
+	s1, _ := txMgr.NewTxSimulator("test_tx1")
+	require.NoError(t, s1.SetState("ns1", "key1", []byte("value1")))
+	require.NoError(t, s1.SetState("ns2", "key3", []byte("value3")))
+
+	s1.Done()
+	txRWSet1, _ := s1.GetTxSimulationResults()
+	txMgrHelper.validateAndCommitRWSet(txRWSet1.PubSimulationResults)
+
+	hashRoot1 := txMgr.stateTrie.RootHash()
+	require.NotNil(t, hashRoot1)
+
+	s2, _ := txMgr.NewTxSimulator("test_tx2")
+	require.NoError(t, s2.SetState("ns1", "key2", []byte("value2")))
+	require.NoError(t, s2.SetState("ns2", "key4", []byte("value4")))
+	require.NoError(t, s2.SetState("ns1", "key1", []byte("value5")))
+
+	s2.Done()
+	txRWSet2, _ := s2.GetTxSimulationResults()
+	txMgrHelper.validateAndCommitRWSet(txRWSet2.PubSimulationResults)
+
+	hashRoot2 := txMgr.stateTrie.RootHash()
+	require.NotNil(t, hashRoot2)
+	require.NotEqual(t, hashRoot1, hashRoot2)
+}

@@ -19,7 +19,7 @@ func CreateMockChannel(p *Peer, cid string, resources channelconfig.Resources) e
 
 	if ledger = p.GetLedger(cid); ledger == nil {
 		gb, _ := configtxtest.MakeGenesisBlock(cid)
-		if ledger, err = p.LedgerMgr.CreateLedger(cid, gb); err != nil {
+		if ledger, err = p.LedgerMgr.CreateLedger(cid, gb, nil); err != nil {
 			return err
 		}
 	}

@@ -18,6 +18,16 @@ type ApplicationConfig struct {
 	aPIPolicyMapperReturnsOnCall map[int]struct {
 		result1 channelconfig.PolicyMapper
 	}
+	AttestationCheckingParametersStub        func() channelconfig.AttestationCheckingParameters
+	attestationCheckingParametersMutex       sync.RWMutex
+	attestationCheckingParametersArgsForCall []struct {
+	}
+	attestationCheckingParametersReturns struct {
+		result1 channelconfig.AttestationCheckingParameters
+	}
+	attestationCheckingParametersReturnsOnCall map[int]struct {
+		result1 channelconfig.AttestationCheckingParameters
+	}
 	CapabilitiesStub        func() channelconfig.ApplicationCapabilities
 	capabilitiesMutex       sync.RWMutex
 	capabilitiesArgsForCall []struct {
@@ -92,6 +102,59 @@ func (fake *ApplicationConfig) APIPolicyMapperReturnsOnCall(i int, result1 chann
 	}
 	fake.aPIPolicyMapperReturnsOnCall[i] = struct {
 		result1 channelconfig.PolicyMapper
+	}{result1}
+}
+
+func (fake *ApplicationConfig) AttestationCheckingParameters() channelconfig.AttestationCheckingParameters {
+	fake.attestationCheckingParametersMutex.Lock()
+	ret, specificReturn := fake.attestationCheckingParametersReturnsOnCall[len(fake.attestationCheckingParametersArgsForCall)]
+	fake.attestationCheckingParametersArgsForCall = append(fake.attestationCheckingParametersArgsForCall, struct {
+	}{})
+	stub := fake.AttestationCheckingParametersStub
+	fakeReturns := fake.attestationCheckingParametersReturns
+	fake.recordInvocation("AttestationCheckingParameters", []interface{}{})
+	fake.attestationCheckingParametersMutex.Unlock()
+	if stub != nil {
+		return stub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *ApplicationConfig) AttestationCheckingParametersCallCount() int {
+	fake.attestationCheckingParametersMutex.RLock()
+	defer fake.attestationCheckingParametersMutex.RUnlock()
+	return len(fake.attestationCheckingParametersArgsForCall)
+}
+
+func (fake *ApplicationConfig) AttestationCheckingParametersCalls(stub func() channelconfig.AttestationCheckingParameters) {
+	fake.attestationCheckingParametersMutex.Lock()
+	defer fake.attestationCheckingParametersMutex.Unlock()
+	fake.AttestationCheckingParametersStub = stub
+}
+
+func (fake *ApplicationConfig) AttestationCheckingParametersReturns(result1 channelconfig.AttestationCheckingParameters) {
+	fake.attestationCheckingParametersMutex.Lock()
+	defer fake.attestationCheckingParametersMutex.Unlock()
+	fake.AttestationCheckingParametersStub = nil
+	fake.attestationCheckingParametersReturns = struct {
+		result1 channelconfig.AttestationCheckingParameters
+	}{result1}
+}
+
+func (fake *ApplicationConfig) AttestationCheckingParametersReturnsOnCall(i int, result1 channelconfig.AttestationCheckingParameters) {
+	fake.attestationCheckingParametersMutex.Lock()
+	defer fake.attestationCheckingParametersMutex.Unlock()
+	fake.AttestationCheckingParametersStub = nil
+	if fake.attestationCheckingParametersReturnsOnCall == nil {
+		fake.attestationCheckingParametersReturnsOnCall = make(map[int]struct {
+			result1 channelconfig.AttestationCheckingParameters
+		})
+	}
+	fake.attestationCheckingParametersReturnsOnCall[i] = struct {
+		result1 channelconfig.AttestationCheckingParameters
 	}{result1}
 }
 
@@ -206,6 +269,8 @@ func (fake *ApplicationConfig) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.aPIPolicyMapperMutex.RLock()
 	defer fake.aPIPolicyMapperMutex.RUnlock()
+	fake.attestationCheckingParametersMutex.RLock()
+	defer fake.attestationCheckingParametersMutex.RUnlock()
 	fake.capabilitiesMutex.RLock()
 	defer fake.capabilitiesMutex.RUnlock()
 	fake.organizationsMutex.RLock()

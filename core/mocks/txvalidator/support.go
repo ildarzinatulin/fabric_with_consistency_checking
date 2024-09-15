@@ -43,6 +43,10 @@ func (ms *Support) Capabilities() channelconfig.ApplicationCapabilities {
 	return ms.ACVal
 }
 
+func (ms *Support) AttestationCheckingParameters() channelconfig.AttestationCheckingParameters {
+	return nil
+}
+
 // Ledger returns LedgerVal
 func (ms *Support) Ledger() ledger.PeerLedger {
 	return ms.LedgerVal

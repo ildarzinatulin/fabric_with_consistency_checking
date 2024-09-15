@@ -72,7 +72,7 @@ func CreateSnapshotWithGenesisBlock(t *testing.T, testDir string, ledgerID strin
 	defer ledgerMgr.Close()
 
 	_, gb := testutil.NewBlockGenerator(t, ledgerID, false)
-	l, err := ledgerMgr.CreateLedger(ledgerID, gb)
+	l, err := ledgerMgr.CreateLedger(ledgerID, gb, nil)
 	require.NoError(t, err)
 
 	require.NoError(t, l.SubmitSnapshotRequest(0))

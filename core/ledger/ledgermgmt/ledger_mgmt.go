@@ -21,6 +21,7 @@ import (
 	"github.com/hyperledger/fabric/core/ledger/kvledger"
 	"github.com/hyperledger/fabric/internal/fileutil"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
 )
 
 var logger = flogging.MustGetLogger("ledgermgmt")
@@ -103,7 +104,7 @@ func NewLedgerMgr(initializer *Initializer) *LedgerMgr {
 // This function guarantees that the creation of ledger and committing the genesis block would an atomic action.
 // The channel id retrieved from the genesis block is treated as a ledger id.
 // It returns an error if another ledger is being created from a snapshot.
-func (m *LedgerMgr) CreateLedger(id string, genesisBlock *common.Block) (ledger.PeerLedger, error) {
+func (m *LedgerMgr) CreateLedger(id string, genesisBlock *common.Block, stateTrie *mpt.Trie) (ledger.PeerLedger, error) {
 	m.creationLock.Lock()
 	defer m.creationLock.Unlock()
 
@@ -114,7 +115,7 @@ func (m *LedgerMgr) CreateLedger(id string, genesisBlock *common.Block) (ledger.
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	logger.Infof("Creating ledger [%s] with genesis block", id)
-	l, err := m.ledgerProvider.CreateFromGenesisBlock(genesisBlock)
+	l, err := m.ledgerProvider.CreateFromGenesisBlock(genesisBlock, stateTrie)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +201,7 @@ func (m *LedgerMgr) resetJoinBySnapshotStatus() {
 }
 
 // OpenLedger returns a ledger for the given id
-func (m *LedgerMgr) OpenLedger(id string) (ledger.PeerLedger, error) {
+func (m *LedgerMgr) OpenLedger(id string, stateTrie *mpt.Trie) (ledger.PeerLedger, error) {
 	logger.Infof("Opening ledger with id = %s", id)
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -208,7 +209,7 @@ func (m *LedgerMgr) OpenLedger(id string) (ledger.PeerLedger, error) {
 	if ok {
 		return nil, ErrLedgerAlreadyOpened
 	}
-	l, err := m.ledgerProvider.Open(id)
+	l, err := m.ledgerProvider.Open(id, stateTrie)
 	if err != nil {
 		return nil, err
 	}

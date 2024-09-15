@@ -53,6 +53,11 @@ func (mch *mockChain) Configure(config *cb.Envelope, configSeq uint64) error {
 	return nil
 }
 
+func (mch *mockChain) SendAttestationResult(env *cb.Envelope, configSeq uint64) error {
+	mch.queue <- env
+	return nil
+}
+
 func (mch *mockChain) WaitReady() error {
 	return nil
 }

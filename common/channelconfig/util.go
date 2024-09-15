@@ -182,6 +182,18 @@ func CapabilitiesValue(capabilities map[string]bool) *StandardConfigValue {
 	}
 }
 
+func AttestationCheckingValue(requiredNumberOfMessages uint32, frequency uint32) *StandardConfigValue {
+	parameters := &cb.AttestationCheckingParameters{
+		EnableChecking:           true,
+		RequiredNumberOfMessages: requiredNumberOfMessages,
+		Frequency:                frequency,
+	}
+	return &StandardConfigValue{
+		key:   AttestationCheckingParametersKey,
+		value: parameters,
+	}
+}
+
 func OrderersValue(consenters []*cb.Consenter) *StandardConfigValue {
 	o := &cb.Orderers{
 		ConsenterMapping: consenters,

@@ -394,5 +394,63 @@ var _ = Describe("Broadcast", func() {
 				})
 			})
 		})
+
+		Context("when the message is a attestation message", func() {
+			var fakeAttestation *cb.Envelope
+
+			BeforeEach(func() {
+				fakeAttestation = &cb.Envelope{}
+
+				fakeSupportRegistrar.BroadcastChannelSupportReturns(&cb.ChannelHeader{
+					Type:      10,
+					ChannelId: "fake-channel",
+				}, true, fakeSupport, nil)
+			})
+
+			It("enqueues the message as a attestation result message to the consenter", func() {
+				fakeSupport.ProcessAttestationMsgReturns(fakeAttestation, 3, nil)
+
+				err := handler.Handle(fakeABServer)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeSupport.ProcessNormalMsgCallCount()).To(Equal(0))
+				Expect(fakeSupport.ProcessConfigUpdateMsgCallCount()).To(Equal(0))
+				Expect(fakeSupport.ProcessAttestationMsgCallCount()).To(Equal(1))
+				Expect(fakeSupport.ProcessAttestationMsgArgsForCall(0)).To(Equal(fakeMsg))
+
+				Expect(fakeSupport.WaitReadyCallCount()).To(Equal(1))
+
+				Expect(fakeSupport.OrderCallCount()).To(Equal(0))
+				Expect(fakeSupport.ConfigureCallCount()).To(Equal(0))
+				Expect(fakeSupport.SendAttestationResultCallCount()).To(Equal(1))
+				attestationMsg, seq := fakeSupport.SendAttestationResultArgsForCall(0)
+				Expect(attestationMsg).To(Equal(fakeAttestation))
+				Expect(seq).To(Equal(uint64(3)))
+
+				Expect(fakeABServer.SendCallCount()).To(Equal(1))
+				Expect(proto.Equal(fakeABServer.SendArgsForCall(0), &ab.BroadcastResponse{Status: cb.Status_SUCCESS})).To(BeTrue())
+			})
+
+			It("processor return nil for attestation result", func() {
+				fakeSupport.ProcessAttestationMsgReturns(nil, 3, nil)
+
+				err := handler.Handle(fakeABServer)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeSupport.ProcessNormalMsgCallCount()).To(Equal(0))
+				Expect(fakeSupport.ProcessConfigUpdateMsgCallCount()).To(Equal(0))
+				Expect(fakeSupport.ProcessAttestationMsgCallCount()).To(Equal(1))
+				Expect(fakeSupport.ProcessAttestationMsgArgsForCall(0)).To(Equal(fakeMsg))
+
+				Expect(fakeSupport.WaitReadyCallCount()).To(Equal(0))
+
+				Expect(fakeSupport.OrderCallCount()).To(Equal(0))
+				Expect(fakeSupport.ConfigureCallCount()).To(Equal(0))
+				Expect(fakeSupport.SendAttestationResultCallCount()).To(Equal(0))
+
+				Expect(fakeABServer.SendCallCount()).To(Equal(1))
+				Expect(proto.Equal(fakeABServer.SendArgsForCall(0), &ab.BroadcastResponse{Status: cb.Status_SUCCESS})).To(BeTrue())
+			})
+		})
 	})
 })

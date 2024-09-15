@@ -125,7 +125,7 @@ func TestSnapshotRequests(t *testing.T) {
 	ledgerID := "testsnapshotrequests"
 	bg, gb := testutil.NewBlockGenerator(t, ledgerID, false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	l, err := provider.CreateFromGenesisBlock(gb)
+	l, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer l.Close()
 	kvledger := l.(*kvLedger)
@@ -206,7 +206,7 @@ func TestSnapshotRequests(t *testing.T) {
 	provider.Close()
 	provider2 := testutilNewProvider(conf, t, &mock.DeployedChaincodeInfoProvider{})
 	defer provider2.Close()
-	l2, err := provider2.Open(ledgerID)
+	l2, err := provider2.Open(ledgerID, nil)
 	require.NoError(t, err)
 	kvledger2 := l2.(*kvLedger)
 
@@ -235,7 +235,7 @@ func TestSnapshotMgmtConcurrency(t *testing.T) {
 	ledgerID := "testsnapshotmgmtconcurrency"
 	bg, gb := testutil.NewBlockGenerator(t, ledgerID, false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	l, err := provider.CreateFromGenesisBlock(gb)
+	l, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	kvledger := l.(*kvLedger)
 	defer kvledger.Close()
@@ -265,7 +265,7 @@ func TestSnapshotMgrShutdown(t *testing.T) {
 
 	ledgerID := "testsnapshotmgrshutdown"
 	_, gb := testutil.NewBlockGenerator(t, ledgerID, false)
-	l, err := provider.CreateFromGenesisBlock(gb)
+	l, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	kvledger := l.(*kvLedger)
 
@@ -302,7 +302,7 @@ func TestSnapshotRequestsErrorPaths(t *testing.T) {
 	ledgerID := "testsnapshotrequestserrorpaths"
 	bg, gb := testutil.NewBlockGenerator(t, ledgerID, false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	l, err := provider.CreateFromGenesisBlock(gb)
+	l, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	defer l.Close()
 
@@ -331,7 +331,7 @@ func TestSnapshotRequestsErrorPaths(t *testing.T) {
 
 	provider.Close()
 
-	_, err = provider.Open(ledgerID)
+	_, err = provider.Open(ledgerID, nil)
 	require.Contains(t, err.Error(), "leveldb: closed")
 
 	err = l.SubmitSnapshotRequest(20)

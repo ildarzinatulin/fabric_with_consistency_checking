@@ -23,7 +23,7 @@ func TestRebuildDBs(t *testing.T) {
 	numLedgers := 3
 	for i := 0; i < numLedgers; i++ {
 		genesisBlock, _ := configtxtest.MakeGenesisBlock(constructTestLedgerID(i))
-		_, err := provider.CreateFromGenesisBlock(genesisBlock)
+		_, err := provider.CreateFromGenesisBlock(genesisBlock, nil)
 		require.NoError(t, err)
 	}
 

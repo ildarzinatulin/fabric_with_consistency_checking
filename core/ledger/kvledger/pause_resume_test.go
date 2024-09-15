@@ -29,7 +29,7 @@ func TestPauseAndResume(t *testing.T) {
 	for i := 0; i < numLedgers; i++ {
 		genesisBlock, _ := configtxtest.MakeGenesisBlock(constructTestLedgerID(i))
 		genesisBlocks[i] = genesisBlock
-		_, err := provider.CreateFromGenesisBlock(genesisBlock)
+		_, err := provider.CreateFromGenesisBlock(genesisBlock, nil)
 		require.NoError(t, err)
 	}
 	activeLedgerIDs, err = provider.List()
@@ -67,7 +67,7 @@ func TestPauseAndResume(t *testing.T) {
 	assertLedgerStatus(t, provider, genesisBlocks, numLedgers, pausedLedgersAfterResume)
 
 	// open paused channel should fail
-	_, err = provider.Open(constructTestLedgerID(3))
+	_, err = provider.Open(constructTestLedgerID(3), nil)
 	require.EqualError(t, err, "cannot open ledger [ledger_000003], ledger status is [INACTIVE]")
 }
 
@@ -78,7 +78,7 @@ func TestPauseAndResumeErrors(t *testing.T) {
 
 	ledgerID := constructTestLedgerID(0)
 	genesisBlock, _ := configtxtest.MakeGenesisBlock(ledgerID)
-	_, err := provider.CreateFromGenesisBlock(genesisBlock)
+	_, err := provider.CreateFromGenesisBlock(genesisBlock, nil)
 	require.NoError(t, err)
 	// purposely set an invalid metatdata
 	require.NoError(t, provider.idStore.db.Put(metadataKey(ledgerID), []byte("invalid"), true))

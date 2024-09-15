@@ -41,8 +41,10 @@ type SystemChannel struct {
 // NewSystemChannel creates a new system channel message processor.
 func NewSystemChannel(support StandardChannelSupport, templator ChannelConfigTemplator, filters *RuleSet, bccsp bccsp.BCCSP) *SystemChannel {
 	logger.Debugf("Creating system channel msg processor for channel %s", support.ChannelID())
+
+	attestationMessagesStorage := NewAttestationMessageStorage(support.ChannelID())
 	return &SystemChannel{
-		StandardChannel: NewStandardChannel(support, filters, bccsp),
+		StandardChannel: NewStandardChannel(support, filters, bccsp, attestationMessagesStorage),
 		templator:       templator,
 	}
 }
@@ -194,6 +196,19 @@ func (s *SystemChannel) ProcessConfigMsg(env *cb.Envelope) (*cb.Envelope, uint64
 	default:
 		return nil, 0, fmt.Errorf("Panic processing config msg due to unexpected envelope type %s", cb.HeaderType_name[chdr.Type])
 	}
+}
+
+func (s *SystemChannel) ProcessAttestationMsg(env *cb.Envelope) (config *cb.Envelope, configSeq uint64, err error) {
+	channelID, err := protoutil.ChannelID(env)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	if channelID != s.support.ChannelID() {
+		return nil, 0, ErrChannelDoesNotExist
+	}
+
+	return s.StandardChannel.ProcessAttestationMsg(env)
 }
 
 // DefaultTemplatorSupport is the subset of the channel config required by the DefaultTemplator.

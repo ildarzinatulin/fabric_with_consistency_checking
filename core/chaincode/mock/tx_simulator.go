@@ -399,15 +399,16 @@ func (fake *TxSimulator) DeletePrivateData(arg1 string, arg2 string, arg3 string
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.DeletePrivateDataStub
+	fakeReturns := fake.deletePrivateDataReturns
 	fake.recordInvocation("DeletePrivateData", []interface{}{arg1, arg2, arg3})
 	fake.deletePrivateDataMutex.Unlock()
-	if fake.DeletePrivateDataStub != nil {
-		return fake.DeletePrivateDataStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deletePrivateDataReturns
 	return fakeReturns.result1
 }
 
@@ -461,15 +462,16 @@ func (fake *TxSimulator) DeletePrivateDataMetadata(arg1 string, arg2 string, arg
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.DeletePrivateDataMetadataStub
+	fakeReturns := fake.deletePrivateDataMetadataReturns
 	fake.recordInvocation("DeletePrivateDataMetadata", []interface{}{arg1, arg2, arg3})
 	fake.deletePrivateDataMetadataMutex.Unlock()
-	if fake.DeletePrivateDataMetadataStub != nil {
-		return fake.DeletePrivateDataMetadataStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deletePrivateDataMetadataReturns
 	return fakeReturns.result1
 }
 
@@ -522,15 +524,16 @@ func (fake *TxSimulator) DeleteState(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DeleteStateStub
+	fakeReturns := fake.deleteStateReturns
 	fake.recordInvocation("DeleteState", []interface{}{arg1, arg2})
 	fake.deleteStateMutex.Unlock()
-	if fake.DeleteStateStub != nil {
-		return fake.DeleteStateStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteStateReturns
 	return fakeReturns.result1
 }
 
@@ -583,15 +586,16 @@ func (fake *TxSimulator) DeleteStateMetadata(arg1 string, arg2 string) error {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.DeleteStateMetadataStub
+	fakeReturns := fake.deleteStateMetadataReturns
 	fake.recordInvocation("DeleteStateMetadata", []interface{}{arg1, arg2})
 	fake.deleteStateMetadataMutex.Unlock()
-	if fake.DeleteStateMetadataStub != nil {
-		return fake.DeleteStateMetadataStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.deleteStateMetadataReturns
 	return fakeReturns.result1
 }
 
@@ -641,9 +645,10 @@ func (fake *TxSimulator) Done() {
 	fake.doneMutex.Lock()
 	fake.doneArgsForCall = append(fake.doneArgsForCall, struct {
 	}{})
+	stub := fake.DoneStub
 	fake.recordInvocation("Done", []interface{}{})
 	fake.doneMutex.Unlock()
-	if fake.DoneStub != nil {
+	if stub != nil {
 		fake.DoneStub()
 	}
 }
@@ -667,15 +672,16 @@ func (fake *TxSimulator) ExecuteQuery(arg1 string, arg2 string) (ledger.ResultsI
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.ExecuteQueryStub
+	fakeReturns := fake.executeQueryReturns
 	fake.recordInvocation("ExecuteQuery", []interface{}{arg1, arg2})
 	fake.executeQueryMutex.Unlock()
-	if fake.ExecuteQueryStub != nil {
-		return fake.ExecuteQueryStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.executeQueryReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -732,15 +738,16 @@ func (fake *TxSimulator) ExecuteQueryOnPrivateData(arg1 string, arg2 string, arg
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.ExecuteQueryOnPrivateDataStub
+	fakeReturns := fake.executeQueryOnPrivateDataReturns
 	fake.recordInvocation("ExecuteQueryOnPrivateData", []interface{}{arg1, arg2, arg3})
 	fake.executeQueryOnPrivateDataMutex.Unlock()
-	if fake.ExecuteQueryOnPrivateDataStub != nil {
-		return fake.ExecuteQueryOnPrivateDataStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.executeQueryOnPrivateDataReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -798,15 +805,16 @@ func (fake *TxSimulator) ExecuteQueryWithPagination(arg1 string, arg2 string, ar
 		arg3 string
 		arg4 int32
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.ExecuteQueryWithPaginationStub
+	fakeReturns := fake.executeQueryWithPaginationReturns
 	fake.recordInvocation("ExecuteQueryWithPagination", []interface{}{arg1, arg2, arg3, arg4})
 	fake.executeQueryWithPaginationMutex.Unlock()
-	if fake.ExecuteQueryWithPaginationStub != nil {
-		return fake.ExecuteQueryWithPaginationStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.executeQueryWithPaginationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -861,15 +869,16 @@ func (fake *TxSimulator) ExecuteUpdate(arg1 string) error {
 	fake.executeUpdateArgsForCall = append(fake.executeUpdateArgsForCall, struct {
 		arg1 string
 	}{arg1})
+	stub := fake.ExecuteUpdateStub
+	fakeReturns := fake.executeUpdateReturns
 	fake.recordInvocation("ExecuteUpdate", []interface{}{arg1})
 	fake.executeUpdateMutex.Unlock()
-	if fake.ExecuteUpdateStub != nil {
-		return fake.ExecuteUpdateStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.executeUpdateReturns
 	return fakeReturns.result1
 }
 
@@ -923,15 +932,16 @@ func (fake *TxSimulator) GetPrivateData(arg1 string, arg2 string, arg3 string) (
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetPrivateDataStub
+	fakeReturns := fake.getPrivateDataReturns
 	fake.recordInvocation("GetPrivateData", []interface{}{arg1, arg2, arg3})
 	fake.getPrivateDataMutex.Unlock()
-	if fake.GetPrivateDataStub != nil {
-		return fake.GetPrivateDataStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPrivateDataReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -988,15 +998,16 @@ func (fake *TxSimulator) GetPrivateDataHash(arg1 string, arg2 string, arg3 strin
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetPrivateDataHashStub
+	fakeReturns := fake.getPrivateDataHashReturns
 	fake.recordInvocation("GetPrivateDataHash", []interface{}{arg1, arg2, arg3})
 	fake.getPrivateDataHashMutex.Unlock()
-	if fake.GetPrivateDataHashStub != nil {
-		return fake.GetPrivateDataHashStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPrivateDataHashReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1053,15 +1064,16 @@ func (fake *TxSimulator) GetPrivateDataMetadata(arg1 string, arg2 string, arg3 s
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetPrivateDataMetadataStub
+	fakeReturns := fake.getPrivateDataMetadataReturns
 	fake.recordInvocation("GetPrivateDataMetadata", []interface{}{arg1, arg2, arg3})
 	fake.getPrivateDataMetadataMutex.Unlock()
-	if fake.GetPrivateDataMetadataStub != nil {
-		return fake.GetPrivateDataMetadataStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPrivateDataMetadataReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1123,15 +1135,16 @@ func (fake *TxSimulator) GetPrivateDataMetadataByHash(arg1 string, arg2 string, 
 		arg2 string
 		arg3 []byte
 	}{arg1, arg2, arg3Copy})
+	stub := fake.GetPrivateDataMetadataByHashStub
+	fakeReturns := fake.getPrivateDataMetadataByHashReturns
 	fake.recordInvocation("GetPrivateDataMetadataByHash", []interface{}{arg1, arg2, arg3Copy})
 	fake.getPrivateDataMetadataByHashMutex.Unlock()
-	if fake.GetPrivateDataMetadataByHashStub != nil {
-		return fake.GetPrivateDataMetadataByHashStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPrivateDataMetadataByHashReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1193,15 +1206,16 @@ func (fake *TxSimulator) GetPrivateDataMultipleKeys(arg1 string, arg2 string, ar
 		arg2 string
 		arg3 []string
 	}{arg1, arg2, arg3Copy})
+	stub := fake.GetPrivateDataMultipleKeysStub
+	fakeReturns := fake.getPrivateDataMultipleKeysReturns
 	fake.recordInvocation("GetPrivateDataMultipleKeys", []interface{}{arg1, arg2, arg3Copy})
 	fake.getPrivateDataMultipleKeysMutex.Unlock()
-	if fake.GetPrivateDataMultipleKeysStub != nil {
-		return fake.GetPrivateDataMultipleKeysStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPrivateDataMultipleKeysReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1259,15 +1273,16 @@ func (fake *TxSimulator) GetPrivateDataRangeScanIterator(arg1 string, arg2 strin
 		arg3 string
 		arg4 string
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.GetPrivateDataRangeScanIteratorStub
+	fakeReturns := fake.getPrivateDataRangeScanIteratorReturns
 	fake.recordInvocation("GetPrivateDataRangeScanIterator", []interface{}{arg1, arg2, arg3, arg4})
 	fake.getPrivateDataRangeScanIteratorMutex.Unlock()
-	if fake.GetPrivateDataRangeScanIteratorStub != nil {
-		return fake.GetPrivateDataRangeScanIteratorStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getPrivateDataRangeScanIteratorReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1323,15 +1338,16 @@ func (fake *TxSimulator) GetState(arg1 string, arg2 string) ([]byte, error) {
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetStateStub
+	fakeReturns := fake.getStateReturns
 	fake.recordInvocation("GetState", []interface{}{arg1, arg2})
 	fake.getStateMutex.Unlock()
-	if fake.GetStateStub != nil {
-		return fake.GetStateStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getStateReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1387,15 +1403,16 @@ func (fake *TxSimulator) GetStateMetadata(arg1 string, arg2 string) (map[string]
 		arg1 string
 		arg2 string
 	}{arg1, arg2})
+	stub := fake.GetStateMetadataStub
+	fakeReturns := fake.getStateMetadataReturns
 	fake.recordInvocation("GetStateMetadata", []interface{}{arg1, arg2})
 	fake.getStateMetadataMutex.Unlock()
-	if fake.GetStateMetadataStub != nil {
-		return fake.GetStateMetadataStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getStateMetadataReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1456,15 +1473,16 @@ func (fake *TxSimulator) GetStateMultipleKeys(arg1 string, arg2 []string) ([][]b
 		arg1 string
 		arg2 []string
 	}{arg1, arg2Copy})
+	stub := fake.GetStateMultipleKeysStub
+	fakeReturns := fake.getStateMultipleKeysReturns
 	fake.recordInvocation("GetStateMultipleKeys", []interface{}{arg1, arg2Copy})
 	fake.getStateMultipleKeysMutex.Unlock()
-	if fake.GetStateMultipleKeysStub != nil {
-		return fake.GetStateMultipleKeysStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getStateMultipleKeysReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1521,15 +1539,16 @@ func (fake *TxSimulator) GetStateRangeScanIterator(arg1 string, arg2 string, arg
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.GetStateRangeScanIteratorStub
+	fakeReturns := fake.getStateRangeScanIteratorReturns
 	fake.recordInvocation("GetStateRangeScanIterator", []interface{}{arg1, arg2, arg3})
 	fake.getStateRangeScanIteratorMutex.Unlock()
-	if fake.GetStateRangeScanIteratorStub != nil {
-		return fake.GetStateRangeScanIteratorStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getStateRangeScanIteratorReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1587,15 +1606,16 @@ func (fake *TxSimulator) GetStateRangeScanIteratorWithPagination(arg1 string, ar
 		arg3 string
 		arg4 int32
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.GetStateRangeScanIteratorWithPaginationStub
+	fakeReturns := fake.getStateRangeScanIteratorWithPaginationReturns
 	fake.recordInvocation("GetStateRangeScanIteratorWithPagination", []interface{}{arg1, arg2, arg3, arg4})
 	fake.getStateRangeScanIteratorWithPaginationMutex.Unlock()
-	if fake.GetStateRangeScanIteratorWithPaginationStub != nil {
-		return fake.GetStateRangeScanIteratorWithPaginationStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getStateRangeScanIteratorWithPaginationReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1649,15 +1669,16 @@ func (fake *TxSimulator) GetTxSimulationResults() (*ledgera.TxSimulationResults,
 	ret, specificReturn := fake.getTxSimulationResultsReturnsOnCall[len(fake.getTxSimulationResultsArgsForCall)]
 	fake.getTxSimulationResultsArgsForCall = append(fake.getTxSimulationResultsArgsForCall, struct {
 	}{})
+	stub := fake.GetTxSimulationResultsStub
+	fakeReturns := fake.getTxSimulationResultsReturns
 	fake.recordInvocation("GetTxSimulationResults", []interface{}{})
 	fake.getTxSimulationResultsMutex.Unlock()
-	if fake.GetTxSimulationResultsStub != nil {
-		return fake.GetTxSimulationResultsStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.getTxSimulationResultsReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -1707,15 +1728,16 @@ func (fake *TxSimulator) PurgePrivateData(arg1 string, arg2 string, arg3 string)
 		arg2 string
 		arg3 string
 	}{arg1, arg2, arg3})
+	stub := fake.PurgePrivateDataStub
+	fakeReturns := fake.purgePrivateDataReturns
 	fake.recordInvocation("PurgePrivateData", []interface{}{arg1, arg2, arg3})
 	fake.purgePrivateDataMutex.Unlock()
-	if fake.PurgePrivateDataStub != nil {
-		return fake.PurgePrivateDataStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.purgePrivateDataReturns
 	return fakeReturns.result1
 }
 
@@ -1775,15 +1797,16 @@ func (fake *TxSimulator) SetPrivateData(arg1 string, arg2 string, arg3 string, a
 		arg3 string
 		arg4 []byte
 	}{arg1, arg2, arg3, arg4Copy})
+	stub := fake.SetPrivateDataStub
+	fakeReturns := fake.setPrivateDataReturns
 	fake.recordInvocation("SetPrivateData", []interface{}{arg1, arg2, arg3, arg4Copy})
 	fake.setPrivateDataMutex.Unlock()
-	if fake.SetPrivateDataStub != nil {
-		return fake.SetPrivateDataStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setPrivateDataReturns
 	return fakeReturns.result1
 }
 
@@ -1838,15 +1861,16 @@ func (fake *TxSimulator) SetPrivateDataMetadata(arg1 string, arg2 string, arg3 s
 		arg3 string
 		arg4 map[string][]byte
 	}{arg1, arg2, arg3, arg4})
+	stub := fake.SetPrivateDataMetadataStub
+	fakeReturns := fake.setPrivateDataMetadataReturns
 	fake.recordInvocation("SetPrivateDataMetadata", []interface{}{arg1, arg2, arg3, arg4})
 	fake.setPrivateDataMetadataMutex.Unlock()
-	if fake.SetPrivateDataMetadataStub != nil {
-		return fake.SetPrivateDataMetadataStub(arg1, arg2, arg3, arg4)
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setPrivateDataMetadataReturns
 	return fakeReturns.result1
 }
 
@@ -1900,15 +1924,16 @@ func (fake *TxSimulator) SetPrivateDataMultipleKeys(arg1 string, arg2 string, ar
 		arg2 string
 		arg3 map[string][]byte
 	}{arg1, arg2, arg3})
+	stub := fake.SetPrivateDataMultipleKeysStub
+	fakeReturns := fake.setPrivateDataMultipleKeysReturns
 	fake.recordInvocation("SetPrivateDataMultipleKeys", []interface{}{arg1, arg2, arg3})
 	fake.setPrivateDataMultipleKeysMutex.Unlock()
-	if fake.SetPrivateDataMultipleKeysStub != nil {
-		return fake.SetPrivateDataMultipleKeysStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setPrivateDataMultipleKeysReturns
 	return fakeReturns.result1
 }
 
@@ -1967,15 +1992,16 @@ func (fake *TxSimulator) SetState(arg1 string, arg2 string, arg3 []byte) error {
 		arg2 string
 		arg3 []byte
 	}{arg1, arg2, arg3Copy})
+	stub := fake.SetStateStub
+	fakeReturns := fake.setStateReturns
 	fake.recordInvocation("SetState", []interface{}{arg1, arg2, arg3Copy})
 	fake.setStateMutex.Unlock()
-	if fake.SetStateStub != nil {
-		return fake.SetStateStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setStateReturns
 	return fakeReturns.result1
 }
 
@@ -2029,15 +2055,16 @@ func (fake *TxSimulator) SetStateMetadata(arg1 string, arg2 string, arg3 map[str
 		arg2 string
 		arg3 map[string][]byte
 	}{arg1, arg2, arg3})
+	stub := fake.SetStateMetadataStub
+	fakeReturns := fake.setStateMetadataReturns
 	fake.recordInvocation("SetStateMetadata", []interface{}{arg1, arg2, arg3})
 	fake.setStateMetadataMutex.Unlock()
-	if fake.SetStateMetadataStub != nil {
-		return fake.SetStateMetadataStub(arg1, arg2, arg3)
+	if stub != nil {
+		return stub(arg1, arg2, arg3)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setStateMetadataReturns
 	return fakeReturns.result1
 }
 
@@ -2090,15 +2117,16 @@ func (fake *TxSimulator) SetStateMultipleKeys(arg1 string, arg2 map[string][]byt
 		arg1 string
 		arg2 map[string][]byte
 	}{arg1, arg2})
+	stub := fake.SetStateMultipleKeysStub
+	fakeReturns := fake.setStateMultipleKeysReturns
 	fake.recordInvocation("SetStateMultipleKeys", []interface{}{arg1, arg2})
 	fake.setStateMultipleKeysMutex.Unlock()
-	if fake.SetStateMultipleKeysStub != nil {
-		return fake.SetStateMultipleKeysStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.setStateMultipleKeysReturns
 	return fakeReturns.result1
 }
 

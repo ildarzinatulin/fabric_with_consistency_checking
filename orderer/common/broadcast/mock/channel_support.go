@@ -45,6 +45,21 @@ type ChannelSupport struct {
 	orderReturnsOnCall map[int]struct {
 		result1 error
 	}
+	ProcessAttestationMsgStub        func(*common.Envelope) (*common.Envelope, uint64, error)
+	processAttestationMsgMutex       sync.RWMutex
+	processAttestationMsgArgsForCall []struct {
+		arg1 *common.Envelope
+	}
+	processAttestationMsgReturns struct {
+		result1 *common.Envelope
+		result2 uint64
+		result3 error
+	}
+	processAttestationMsgReturnsOnCall map[int]struct {
+		result1 *common.Envelope
+		result2 uint64
+		result3 error
+	}
 	ProcessConfigMsgStub        func(*common.Envelope) (*common.Envelope, uint64, error)
 	processConfigMsgMutex       sync.RWMutex
 	processConfigMsgArgsForCall []struct {
@@ -88,6 +103,18 @@ type ChannelSupport struct {
 		result1 uint64
 		result2 error
 	}
+	SendAttestationResultStub        func(*common.Envelope, uint64) error
+	sendAttestationResultMutex       sync.RWMutex
+	sendAttestationResultArgsForCall []struct {
+		arg1 *common.Envelope
+		arg2 uint64
+	}
+	sendAttestationResultReturns struct {
+		result1 error
+	}
+	sendAttestationResultReturnsOnCall map[int]struct {
+		result1 error
+	}
 	WaitReadyStub        func() error
 	waitReadyMutex       sync.RWMutex
 	waitReadyArgsForCall []struct {
@@ -108,15 +135,16 @@ func (fake *ChannelSupport) ClassifyMsg(arg1 *common.ChannelHeader) msgprocessor
 	fake.classifyMsgArgsForCall = append(fake.classifyMsgArgsForCall, struct {
 		arg1 *common.ChannelHeader
 	}{arg1})
+	stub := fake.ClassifyMsgStub
+	fakeReturns := fake.classifyMsgReturns
 	fake.recordInvocation("ClassifyMsg", []interface{}{arg1})
 	fake.classifyMsgMutex.Unlock()
-	if fake.ClassifyMsgStub != nil {
-		return fake.ClassifyMsgStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.classifyMsgReturns
 	return fakeReturns.result1
 }
 
@@ -169,15 +197,16 @@ func (fake *ChannelSupport) Configure(arg1 *common.Envelope, arg2 uint64) error 
 		arg1 *common.Envelope
 		arg2 uint64
 	}{arg1, arg2})
+	stub := fake.ConfigureStub
+	fakeReturns := fake.configureReturns
 	fake.recordInvocation("Configure", []interface{}{arg1, arg2})
 	fake.configureMutex.Unlock()
-	if fake.ConfigureStub != nil {
-		return fake.ConfigureStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.configureReturns
 	return fakeReturns.result1
 }
 
@@ -230,15 +259,16 @@ func (fake *ChannelSupport) Order(arg1 *common.Envelope, arg2 uint64) error {
 		arg1 *common.Envelope
 		arg2 uint64
 	}{arg1, arg2})
+	stub := fake.OrderStub
+	fakeReturns := fake.orderReturns
 	fake.recordInvocation("Order", []interface{}{arg1, arg2})
 	fake.orderMutex.Unlock()
-	if fake.OrderStub != nil {
-		return fake.OrderStub(arg1, arg2)
+	if stub != nil {
+		return stub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.orderReturns
 	return fakeReturns.result1
 }
 
@@ -284,21 +314,89 @@ func (fake *ChannelSupport) OrderReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *ChannelSupport) ProcessAttestationMsg(arg1 *common.Envelope) (*common.Envelope, uint64, error) {
+	fake.processAttestationMsgMutex.Lock()
+	ret, specificReturn := fake.processAttestationMsgReturnsOnCall[len(fake.processAttestationMsgArgsForCall)]
+	fake.processAttestationMsgArgsForCall = append(fake.processAttestationMsgArgsForCall, struct {
+		arg1 *common.Envelope
+	}{arg1})
+	stub := fake.ProcessAttestationMsgStub
+	fakeReturns := fake.processAttestationMsgReturns
+	fake.recordInvocation("ProcessAttestationMsg", []interface{}{arg1})
+	fake.processAttestationMsgMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2, ret.result3
+	}
+	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
+}
+
+func (fake *ChannelSupport) ProcessAttestationMsgCallCount() int {
+	fake.processAttestationMsgMutex.RLock()
+	defer fake.processAttestationMsgMutex.RUnlock()
+	return len(fake.processAttestationMsgArgsForCall)
+}
+
+func (fake *ChannelSupport) ProcessAttestationMsgCalls(stub func(*common.Envelope) (*common.Envelope, uint64, error)) {
+	fake.processAttestationMsgMutex.Lock()
+	defer fake.processAttestationMsgMutex.Unlock()
+	fake.ProcessAttestationMsgStub = stub
+}
+
+func (fake *ChannelSupport) ProcessAttestationMsgArgsForCall(i int) *common.Envelope {
+	fake.processAttestationMsgMutex.RLock()
+	defer fake.processAttestationMsgMutex.RUnlock()
+	argsForCall := fake.processAttestationMsgArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *ChannelSupport) ProcessAttestationMsgReturns(result1 *common.Envelope, result2 uint64, result3 error) {
+	fake.processAttestationMsgMutex.Lock()
+	defer fake.processAttestationMsgMutex.Unlock()
+	fake.ProcessAttestationMsgStub = nil
+	fake.processAttestationMsgReturns = struct {
+		result1 *common.Envelope
+		result2 uint64
+		result3 error
+	}{result1, result2, result3}
+}
+
+func (fake *ChannelSupport) ProcessAttestationMsgReturnsOnCall(i int, result1 *common.Envelope, result2 uint64, result3 error) {
+	fake.processAttestationMsgMutex.Lock()
+	defer fake.processAttestationMsgMutex.Unlock()
+	fake.ProcessAttestationMsgStub = nil
+	if fake.processAttestationMsgReturnsOnCall == nil {
+		fake.processAttestationMsgReturnsOnCall = make(map[int]struct {
+			result1 *common.Envelope
+			result2 uint64
+			result3 error
+		})
+	}
+	fake.processAttestationMsgReturnsOnCall[i] = struct {
+		result1 *common.Envelope
+		result2 uint64
+		result3 error
+	}{result1, result2, result3}
+}
+
 func (fake *ChannelSupport) ProcessConfigMsg(arg1 *common.Envelope) (*common.Envelope, uint64, error) {
 	fake.processConfigMsgMutex.Lock()
 	ret, specificReturn := fake.processConfigMsgReturnsOnCall[len(fake.processConfigMsgArgsForCall)]
 	fake.processConfigMsgArgsForCall = append(fake.processConfigMsgArgsForCall, struct {
 		arg1 *common.Envelope
 	}{arg1})
+	stub := fake.ProcessConfigMsgStub
+	fakeReturns := fake.processConfigMsgReturns
 	fake.recordInvocation("ProcessConfigMsg", []interface{}{arg1})
 	fake.processConfigMsgMutex.Unlock()
-	if fake.ProcessConfigMsgStub != nil {
-		return fake.ProcessConfigMsgStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.processConfigMsgReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -356,15 +454,16 @@ func (fake *ChannelSupport) ProcessConfigUpdateMsg(arg1 *common.Envelope) (*comm
 	fake.processConfigUpdateMsgArgsForCall = append(fake.processConfigUpdateMsgArgsForCall, struct {
 		arg1 *common.Envelope
 	}{arg1})
+	stub := fake.ProcessConfigUpdateMsgStub
+	fakeReturns := fake.processConfigUpdateMsgReturns
 	fake.recordInvocation("ProcessConfigUpdateMsg", []interface{}{arg1})
 	fake.processConfigUpdateMsgMutex.Unlock()
-	if fake.ProcessConfigUpdateMsgStub != nil {
-		return fake.ProcessConfigUpdateMsgStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2, ret.result3
 	}
-	fakeReturns := fake.processConfigUpdateMsgReturns
 	return fakeReturns.result1, fakeReturns.result2, fakeReturns.result3
 }
 
@@ -422,15 +521,16 @@ func (fake *ChannelSupport) ProcessNormalMsg(arg1 *common.Envelope) (uint64, err
 	fake.processNormalMsgArgsForCall = append(fake.processNormalMsgArgsForCall, struct {
 		arg1 *common.Envelope
 	}{arg1})
+	stub := fake.ProcessNormalMsgStub
+	fakeReturns := fake.processNormalMsgReturns
 	fake.recordInvocation("ProcessNormalMsg", []interface{}{arg1})
 	fake.processNormalMsgMutex.Unlock()
-	if fake.ProcessNormalMsgStub != nil {
-		return fake.ProcessNormalMsgStub(arg1)
+	if stub != nil {
+		return stub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	fakeReturns := fake.processNormalMsgReturns
 	return fakeReturns.result1, fakeReturns.result2
 }
 
@@ -479,20 +579,83 @@ func (fake *ChannelSupport) ProcessNormalMsgReturnsOnCall(i int, result1 uint64,
 	}{result1, result2}
 }
 
+func (fake *ChannelSupport) SendAttestationResult(arg1 *common.Envelope, arg2 uint64) error {
+	fake.sendAttestationResultMutex.Lock()
+	ret, specificReturn := fake.sendAttestationResultReturnsOnCall[len(fake.sendAttestationResultArgsForCall)]
+	fake.sendAttestationResultArgsForCall = append(fake.sendAttestationResultArgsForCall, struct {
+		arg1 *common.Envelope
+		arg2 uint64
+	}{arg1, arg2})
+	stub := fake.SendAttestationResultStub
+	fakeReturns := fake.sendAttestationResultReturns
+	fake.recordInvocation("SendAttestationResult", []interface{}{arg1, arg2})
+	fake.sendAttestationResultMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	return fakeReturns.result1
+}
+
+func (fake *ChannelSupport) SendAttestationResultCallCount() int {
+	fake.sendAttestationResultMutex.RLock()
+	defer fake.sendAttestationResultMutex.RUnlock()
+	return len(fake.sendAttestationResultArgsForCall)
+}
+
+func (fake *ChannelSupport) SendAttestationResultCalls(stub func(*common.Envelope, uint64) error) {
+	fake.sendAttestationResultMutex.Lock()
+	defer fake.sendAttestationResultMutex.Unlock()
+	fake.SendAttestationResultStub = stub
+}
+
+func (fake *ChannelSupport) SendAttestationResultArgsForCall(i int) (*common.Envelope, uint64) {
+	fake.sendAttestationResultMutex.RLock()
+	defer fake.sendAttestationResultMutex.RUnlock()
+	argsForCall := fake.sendAttestationResultArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *ChannelSupport) SendAttestationResultReturns(result1 error) {
+	fake.sendAttestationResultMutex.Lock()
+	defer fake.sendAttestationResultMutex.Unlock()
+	fake.SendAttestationResultStub = nil
+	fake.sendAttestationResultReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *ChannelSupport) SendAttestationResultReturnsOnCall(i int, result1 error) {
+	fake.sendAttestationResultMutex.Lock()
+	defer fake.sendAttestationResultMutex.Unlock()
+	fake.SendAttestationResultStub = nil
+	if fake.sendAttestationResultReturnsOnCall == nil {
+		fake.sendAttestationResultReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.sendAttestationResultReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *ChannelSupport) WaitReady() error {
 	fake.waitReadyMutex.Lock()
 	ret, specificReturn := fake.waitReadyReturnsOnCall[len(fake.waitReadyArgsForCall)]
 	fake.waitReadyArgsForCall = append(fake.waitReadyArgsForCall, struct {
 	}{})
+	stub := fake.WaitReadyStub
+	fakeReturns := fake.waitReadyReturns
 	fake.recordInvocation("WaitReady", []interface{}{})
 	fake.waitReadyMutex.Unlock()
-	if fake.WaitReadyStub != nil {
-		return fake.WaitReadyStub()
+	if stub != nil {
+		return stub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.waitReadyReturns
 	return fakeReturns.result1
 }
 
@@ -540,12 +703,16 @@ func (fake *ChannelSupport) Invocations() map[string][][]interface{} {
 	defer fake.configureMutex.RUnlock()
 	fake.orderMutex.RLock()
 	defer fake.orderMutex.RUnlock()
+	fake.processAttestationMsgMutex.RLock()
+	defer fake.processAttestationMsgMutex.RUnlock()
 	fake.processConfigMsgMutex.RLock()
 	defer fake.processConfigMsgMutex.RUnlock()
 	fake.processConfigUpdateMsgMutex.RLock()
 	defer fake.processConfigUpdateMsgMutex.RUnlock()
 	fake.processNormalMsgMutex.RLock()
 	defer fake.processNormalMsgMutex.RUnlock()
+	fake.sendAttestationResultMutex.RLock()
+	defer fake.sendAttestationResultMutex.RUnlock()
 	fake.waitReadyMutex.RLock()
 	defer fake.waitReadyMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}

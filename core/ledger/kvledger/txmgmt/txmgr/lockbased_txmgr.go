@@ -27,6 +27,12 @@ import (
 	"github.com/hyperledger/fabric/core/ledger/pvtdatapolicy"
 	"github.com/hyperledger/fabric/core/ledger/util"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
+	"github.com/vldmkr/merkle-patricia-trie/storage"
+)
+
+const (
+	channelConfigKey = "CHANNEL_CONFIG_ENV_BYTES"
 )
 
 var logger = flogging.MustGetLogger("lockbasedtxmgr")
@@ -44,6 +50,8 @@ type LockBasedTxMgr struct {
 	oldBlockCommit      sync.Mutex
 	currentUpdates      *currentUpdates
 	hashFunc            rwsetutil.HashFunc
+	stateTrie           *mpt.Trie
+	mptStorage          *storage.LevelDBAdapter
 }
 
 // pvtdataPurgeMgr wraps the actual purge manager and an additional flag 'usedOnce'
@@ -83,6 +91,7 @@ type Initializer struct {
 	CCInfoProvider      ledger.DeployedChaincodeInfoProvider
 	CustomTxProcessors  map[common.HeaderType]ledger.CustomTxProcessor
 	HashFunc            rwsetutil.HashFunc
+	StateTrie           *mpt.Trie
 }
 
 // NewLockBasedTxMgr constructs a new instance of NewLockBasedTxMgr
@@ -100,6 +109,7 @@ func NewLockBasedTxMgr(initializer *Initializer) (*LockBasedTxMgr, error) {
 		stateListeners: initializer.StateListeners,
 		ccInfoProvider: initializer.CCInfoProvider,
 		hashFunc:       initializer.HashFunc,
+		stateTrie:      initializer.StateTrie,
 	}
 	pvtstatePurgeMgr, err := pvtstatepurgemgmt.InstantiatePurgeMgr(
 		initializer.LedgerID,
@@ -543,6 +553,12 @@ func (txmgr *LockBasedTxMgr) Commit() error {
 		txmgr.commitRWLock.Unlock()
 		return err
 	}
+
+	err := txmgr.updateStateTrie()
+	if err != nil {
+		return err
+	}
+
 	txmgr.commitRWLock.Unlock()
 	// only while holding a lock on oldBlockCommit, we should clear the cache as the
 	// cache is being used by the old pvtData committer to load the version of
@@ -557,6 +573,39 @@ func (txmgr *LockBasedTxMgr) Commit() error {
 	// In the case of error state listeners will not receive this call - instead a peer panic is caused by the ledger upon receiving
 	// an error from this function
 	txmgr.updateStateListeners()
+	return nil
+}
+
+func (txmgr *LockBasedTxMgr) updateStateTrie() error {
+	if txmgr.stateTrie == nil {
+		return nil
+	}
+
+	logger.Error("updateStateTrie")
+
+	namespaces := txmgr.currentUpdates.batch.PubUpdates.GetUpdatedNamespaces()
+	for _, ns := range namespaces {
+		updates := txmgr.currentUpdates.batch.PubUpdates.GetUpdates(ns)
+		for k, vv := range updates {
+			if k == channelConfigKey {
+				continue
+			}
+			if vv.Value == nil {
+				err := txmgr.stateTrie.Put([]byte(k), nil)
+				if err != nil {
+					return err
+				}
+				continue
+			}
+
+			err := txmgr.stateTrie.Put([]byte(k), vv.Value)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	txmgr.stateTrie.Commit()
 	return nil
 }
 

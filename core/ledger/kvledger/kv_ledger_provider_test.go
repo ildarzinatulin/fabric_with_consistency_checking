@@ -64,7 +64,7 @@ func testLedgerProvider(t *testing.T, enableHistoryDB bool) {
 	for i := 0; i < numLedgers; i++ {
 		genesisBlock, _ := configtxtest.MakeGenesisBlock(constructTestLedgerID(i))
 		genesisBlocks[i] = genesisBlock
-		_, err := provider.CreateFromGenesisBlock(genesisBlock)
+		_, err := provider.CreateFromGenesisBlock(genesisBlock, nil)
 		require.NoError(t, err)
 	}
 	existingLedgerIDs, err = provider.List()
@@ -90,7 +90,7 @@ func testLedgerProvider(t *testing.T, enableHistoryDB bool) {
 		ledgerid := constructTestLedgerID(i)
 		status, _ := provider.Exists(ledgerid)
 		require.True(t, status)
-		ledger, err := provider.Open(ledgerid)
+		ledger, err := provider.Open(ledgerid, nil)
 		require.NoError(t, err)
 		bcInfo, err := ledger.GetBlockchainInfo()
 		ledger.Close()
@@ -106,14 +106,14 @@ func testLedgerProvider(t *testing.T, enableHistoryDB bool) {
 		require.Equal(t, msgs.Status_ACTIVE, metadata.Status)
 	}
 	gb, _ := configtxtest.MakeGenesisBlock(constructTestLedgerID(2))
-	_, err = provider.CreateFromGenesisBlock(gb)
+	_, err = provider.CreateFromGenesisBlock(gb, nil)
 	require.EqualError(t, err, "ledger [ledger_000002] already exists with state [ACTIVE]")
 
 	status, err := provider.Exists(constructTestLedgerID(numLedgers))
 	require.NoError(t, err, "Failed to check for ledger existence")
 	require.Equal(t, status, false)
 
-	_, err = provider.Open(constructTestLedgerID(numLedgers))
+	_, err = provider.Open(constructTestLedgerID(numLedgers), nil)
 	require.EqualError(t, err, "cannot open ledger [ledger_000010], ledger does not exist")
 }
 
@@ -158,7 +158,7 @@ func TestLedgerMetataDataUnmarshalError(t *testing.T) {
 
 	ledgerID := constructTestLedgerID(0)
 	genesisBlock, _ := configtxtest.MakeGenesisBlock(ledgerID)
-	_, err := provider.CreateFromGenesisBlock(genesisBlock)
+	_, err := provider.CreateFromGenesisBlock(genesisBlock, nil)
 	require.NoError(t, err)
 
 	// put invalid bytes for the metatdata key
@@ -167,7 +167,7 @@ func TestLedgerMetataDataUnmarshalError(t *testing.T) {
 	_, err = provider.List()
 	require.ErrorContains(t, err, "error unmarshalling ledger metadata")
 
-	_, err = provider.Open(ledgerID)
+	_, err = provider.Open(ledgerID, nil)
 	require.ErrorContains(t, err, "error unmarshalling ledger metadata")
 }
 
@@ -314,7 +314,7 @@ func testDeletionOfUnderConstructionLedgersAtStart(t *testing.T, enableHistoryDB
 	case true:
 		genesisBlock, err := configtxtest.MakeGenesisBlock(ledgerID)
 		require.NoError(t, err)
-		_, err = provider.CreateFromGenesisBlock(genesisBlock)
+		_, err = provider.CreateFromGenesisBlock(genesisBlock, nil)
 		require.NoError(t, err)
 		m, err := provider.idStore.getLedgerMetadata(ledgerID)
 		require.NoError(t, err)
@@ -347,7 +347,7 @@ func TestLedgerCreationFailure(t *testing.T) {
 	genesisBlock, err := configtxtest.MakeGenesisBlock(ledgerID)
 	require.NoError(t, err)
 	genesisBlock.Header.Number = 1 // should cause an error during ledger creation
-	_, err = provider.CreateFromGenesisBlock(genesisBlock)
+	_, err = provider.CreateFromGenesisBlock(genesisBlock, nil)
 	require.EqualError(t, err, "expected block number=0, received block number=1")
 
 	verifyLedgerDoesNotExist(t, provider, ledgerID)
@@ -366,7 +366,7 @@ func TestLedgerCreationFailureDuringLedgerDeletion(t *testing.T) {
 	genesisBlock.Header.Number = 1 // should cause an error during ledger creation
 
 	provider.dbProvider.Close()
-	_, err = provider.CreateFromGenesisBlock(genesisBlock)
+	_, err = provider.CreateFromGenesisBlock(genesisBlock, nil)
 	require.Contains(t, err.Error(), "expected block number=0, received block number=1: error while deleting data from ledger [testLedger]")
 
 	verifyLedgerIDExists(t, provider, ledgerID, msgs.Status_UNDER_CONSTRUCTION)
@@ -381,7 +381,7 @@ func TestMultipleLedgerBasicRW(t *testing.T) {
 	ledgers := make([]ledger.PeerLedger, numLedgers)
 	for i := 0; i < numLedgers; i++ {
 		bg, gb := testutil.NewBlockGenerator(t, constructTestLedgerID(i), false)
-		l, err := provider1.CreateFromGenesisBlock(gb)
+		l, err := provider1.CreateFromGenesisBlock(gb, nil)
 		require.NoError(t, err)
 		ledgers[i] = l
 		txid := util.GenerateUUID()
@@ -404,7 +404,7 @@ func TestMultipleLedgerBasicRW(t *testing.T) {
 	defer provider2.Close()
 	ledgers = make([]ledger.PeerLedger, numLedgers)
 	for i := 0; i < numLedgers; i++ {
-		l, err := provider2.Open(constructTestLedgerID(i))
+		l, err := provider2.Open(constructTestLedgerID(i), nil)
 		require.NoError(t, err)
 		ledgers[i] = l
 	}
@@ -445,7 +445,7 @@ func TestLedgerBackup(t *testing.T) {
 	provider := testutilNewProvider(origConf, t, &mock.DeployedChaincodeInfoProvider{})
 	bg, gb := testutil.NewBlockGenerator(t, ledgerid, false)
 	gbHash := protoutil.BlockHeaderHash(gb.Header)
-	lgr, _ := provider.CreateFromGenesisBlock(gb)
+	lgr, _ := provider.CreateFromGenesisBlock(gb, nil)
 
 	txid := util.GenerateUUID()
 	simulator, _ := lgr.NewTxSimulator(txid)
@@ -499,10 +499,10 @@ func TestLedgerBackup(t *testing.T) {
 	provider = testutilNewProvider(restoreConf, t, &mock.DeployedChaincodeInfoProvider{})
 	defer provider.Close()
 
-	_, err := provider.CreateFromGenesisBlock(gb)
+	_, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.EqualError(t, err, "ledger [TestLedger] already exists with state [ACTIVE]")
 
-	lgr, err = provider.Open(ledgerid)
+	lgr, err = provider.Open(ledgerid, nil)
 	require.NoError(t, err)
 	defer lgr.Close()
 
@@ -574,7 +574,7 @@ func constructTestLedger(t *testing.T, provider *Provider, sequenceID int) strin
 	require.NoError(t, err)
 	require.NotNil(t, gb)
 
-	lgr, err := provider.CreateFromGenesisBlock(gb)
+	lgr, err := provider.CreateFromGenesisBlock(gb, nil)
 	require.NoError(t, err)
 	require.NotNil(t, lgr)
 

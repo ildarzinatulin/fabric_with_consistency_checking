@@ -36,6 +36,11 @@ func TestACL(t *testing.T) {
 					}).Value(),
 				),
 			},
+			AttestationCheckingParametersKey: {
+				Value: protoutil.MarshalOrPanic(
+					AttestationCheckingValue(3, 5).Value(),
+				),
+			},
 		},
 	}
 

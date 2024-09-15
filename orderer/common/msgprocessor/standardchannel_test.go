@@ -22,11 +22,24 @@ import (
 
 const testChannelID = "foo"
 
+//go:generate counterfeiter -o mocks/application_config.go --fake-name ApplicationConfig . applicationConfig
+
+type applicationConfig interface {
+	channelconfig.Application
+}
+
+//go:generate counterfeiter --o mocks/attestation_parameters.go --fake-name AttestationCheckingParameters . attestationCheckingParameters
+
+type attestationCheckingParameters interface {
+	channelconfig.AttestationCheckingParameters
+}
+
 type mockSystemChannelFilterSupport struct {
 	ProposeConfigUpdateVal *cb.ConfigEnvelope
 	ProposeConfigUpdateErr error
 	SequenceVal            uint64
 	OrdererConfigVal       channelconfig.Orderer
+	ApplicationConfigVal   channelconfig.Application
 }
 
 func (ms *mockSystemChannelFilterSupport) ProposeConfigUpdate(env *cb.Envelope) (*cb.ConfigEnvelope, error) {
@@ -51,6 +64,14 @@ func (ms *mockSystemChannelFilterSupport) OrdererConfig() (channelconfig.Orderer
 	}
 
 	return ms.OrdererConfigVal, true
+}
+
+func (ms *mockSystemChannelFilterSupport) ApplicationConfig() (channelconfig.Application, bool) {
+	if ms.ApplicationConfigVal == nil {
+		return nil, false
+	}
+
+	return ms.ApplicationConfigVal, true
 }
 
 func TestClassifyMsg(t *testing.T) {
@@ -80,7 +101,7 @@ func TestProcessNormalMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider).ProcessNormalMsg(nil)
+		cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil).ProcessNormalMsg(nil)
 		require.Equal(t, cs, ms.SequenceVal)
 		require.Nil(t, err)
 	})
@@ -91,7 +112,7 @@ func TestProcessNormalMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		_, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider).ProcessNormalMsg(nil)
+		_, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil).ProcessNormalMsg(nil)
 		require.EqualError(t, err, "normal transactions are rejected: maintenance mode")
 	})
 }
@@ -105,7 +126,7 @@ func TestConfigUpdateMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		config, cs, err := NewStandardChannel(ms, NewRuleSet(nil), cryptoProvider).ProcessConfigUpdateMsg(&cb.Envelope{})
+		config, cs, err := NewStandardChannel(ms, NewRuleSet(nil), cryptoProvider, nil).ProcessConfigUpdateMsg(&cb.Envelope{})
 		require.Nil(t, config)
 		require.Equal(t, uint64(0), cs)
 		require.EqualError(t, err, "error applying config update to existing channel 'foo': An error")
@@ -118,7 +139,7 @@ func TestConfigUpdateMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		config, cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{EmptyRejectRule}), cryptoProvider).ProcessConfigUpdateMsg(&cb.Envelope{})
+		config, cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{EmptyRejectRule}), cryptoProvider, nil).ProcessConfigUpdateMsg(&cb.Envelope{})
 		require.Nil(t, config)
 		require.Equal(t, uint64(0), cs)
 		require.NotNil(t, err)
@@ -129,7 +150,7 @@ func TestConfigUpdateMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		config, cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider).ProcessConfigUpdateMsg(nil)
+		config, cs, err := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil).ProcessConfigUpdateMsg(nil)
 		require.Nil(t, config)
 		require.Equal(t, uint64(0), cs)
 		require.NotNil(t, err)
@@ -143,7 +164,7 @@ func TestConfigUpdateMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider)
+		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil)
 		stdChan.maintenanceFilter = AcceptRule
 		config, cs, err := stdChan.ProcessConfigUpdateMsg(nil)
 		require.NotNil(t, config)
@@ -161,7 +182,7 @@ func TestProcessConfigMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		_, _, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider).ProcessConfigMsg(&cb.Envelope{
+		_, _, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil).ProcessConfigMsg(&cb.Envelope{
 			Payload: protoutil.MarshalOrPanic(&cb.Payload{
 				Header: &cb.Header{
 					ChannelHeader: protoutil.MarshalOrPanic(&cb.ChannelHeader{
@@ -182,7 +203,7 @@ func TestProcessConfigMsg(t *testing.T) {
 		}
 		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
 		require.NoError(t, err)
-		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider)
+		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, nil)
 		stdChan.maintenanceFilter = AcceptRule
 		config, cs, err := stdChan.ProcessConfigMsg(&cb.Envelope{
 			Payload: protoutil.MarshalOrPanic(&cb.Payload{
@@ -204,5 +225,106 @@ func TestProcessConfigMsg(t *testing.T) {
 			int32(cb.HeaderType_CONFIG),
 			hdr.Type,
 			"Expect type of returned envelope to be %d, but got %d", cb.HeaderType_CONFIG, hdr.Type)
+	})
+}
+
+func TestProcessAttestationMsg(t *testing.T) {
+	t.Run("WrongType", func(t *testing.T) {
+		attestationParameters := mocks.AttestationCheckingParameters{}
+		attestationParameters.EnableCheckingReturns(true)
+		attestationParameters.RequiredNumberOfMessagesReturns(1)
+		appConfig := mocks.ApplicationConfig{}
+		appConfig.AttestationCheckingParametersReturns(&attestationParameters)
+		ms := &mockSystemChannelFilterSupport{
+			SequenceVal:            7,
+			ProposeConfigUpdateVal: &cb.ConfigEnvelope{},
+			OrdererConfigVal:       &mocks.OrdererConfig{},
+			ApplicationConfigVal:   &appConfig,
+		}
+		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
+		require.NoError(t, err)
+		st := NewAttestationMessageInMemoryStorage()
+		_, _, err = NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, st).ProcessAttestationMsg(&cb.Envelope{
+			Payload: protoutil.MarshalOrPanic(&cb.Payload{
+				Header: &cb.Header{
+					ChannelHeader: protoutil.MarshalOrPanic(&cb.ChannelHeader{
+						ChannelId: testChannelID,
+						Type:      int32(cb.HeaderType_ORDERER_TRANSACTION),
+					}),
+				},
+			}),
+		})
+		require.Error(t, err)
+	})
+
+	t.Run("Success but without attestation result", func(t *testing.T) {
+		attestationParameters := mocks.AttestationCheckingParameters{}
+		attestationParameters.EnableCheckingReturns(true)
+		attestationParameters.RequiredNumberOfMessagesReturns(2)
+		appConfig := mocks.ApplicationConfig{}
+		appConfig.AttestationCheckingParametersReturns(&attestationParameters)
+		ms := &mockSystemChannelFilterSupport{
+			SequenceVal:            7,
+			ProposeConfigUpdateVal: &cb.ConfigEnvelope{},
+			OrdererConfigVal:       newMockOrdererConfig(true, orderer.ConsensusType_STATE_NORMAL),
+			ApplicationConfigVal:   &appConfig,
+		}
+		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
+		require.NoError(t, err)
+		st := NewAttestationMessageInMemoryStorage()
+		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, st)
+		stdChan.maintenanceFilter = AcceptRule
+		attestationResult, cs, err := stdChan.ProcessAttestationMsg(&cb.Envelope{
+			Payload: protoutil.MarshalOrPanic(&cb.Payload{
+				Header: &cb.Header{
+					ChannelHeader: protoutil.MarshalOrPanic(&cb.ChannelHeader{
+						ChannelId: testChannelID,
+						Type:      int32(cb.HeaderType_ATTESTATION),
+					}),
+				},
+			}),
+		})
+		require.Nil(t, attestationResult)
+		require.Equal(t, cs, uint64(0))
+		require.Nil(t, err)
+	})
+
+	t.Run("Success and returned attestation result", func(t *testing.T) {
+		attestationParameters := mocks.AttestationCheckingParameters{}
+		attestationParameters.EnableCheckingReturns(true)
+		attestationParameters.RequiredNumberOfMessagesReturns(1)
+		appConfig := mocks.ApplicationConfig{}
+		appConfig.AttestationCheckingParametersReturns(&attestationParameters)
+		ms := &mockSystemChannelFilterSupport{
+			SequenceVal:            7,
+			ProposeConfigUpdateVal: &cb.ConfigEnvelope{},
+			OrdererConfigVal:       newMockOrdererConfig(true, orderer.ConsensusType_STATE_NORMAL),
+			ApplicationConfigVal:   &appConfig,
+		}
+		cryptoProvider, err := sw.NewDefaultSecurityLevelWithKeystore(sw.NewDummyKeyStore())
+		require.NoError(t, err)
+		st := NewAttestationMessageInMemoryStorage()
+		stdChan := NewStandardChannel(ms, NewRuleSet([]Rule{AcceptRule}), cryptoProvider, st)
+		stdChan.maintenanceFilter = AcceptRule
+		attestationResult, cs, err := stdChan.ProcessAttestationMsg(&cb.Envelope{
+			Payload: protoutil.MarshalOrPanic(&cb.Payload{
+				Header: &cb.Header{
+					ChannelHeader: protoutil.MarshalOrPanic(&cb.ChannelHeader{
+						ChannelId: testChannelID,
+						Type:      int32(cb.HeaderType_ATTESTATION),
+					}),
+				},
+			}),
+		})
+		require.NotNil(t, attestationResult)
+		require.Equal(t, cs, ms.SequenceVal)
+		require.Nil(t, err)
+		hdr, err := protoutil.ChannelHeader(attestationResult)
+		require.NoError(t, err)
+		require.Equal(
+			t,
+			int32(cb.HeaderType_ATTESTATION_RESULT),
+			hdr.Type,
+			"Expect type of returned envelope to be %d, but got %d", cb.HeaderType_ATTESTATION_RESULT, hdr.Type)
 	})
 }

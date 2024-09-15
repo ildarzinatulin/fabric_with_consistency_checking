@@ -28,6 +28,7 @@ import (
 	"github.com/hyperledger/fabric/msp"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/storage"
 )
 
 // Semaphore provides to the validator means for synchronisation
@@ -54,6 +55,8 @@ type ChannelResources interface {
 
 	// Capabilities defines the capabilities for the application portion of this channel
 	Capabilities() channelconfig.ApplicationCapabilities
+
+	AttestationCheckingParameters() channelconfig.AttestationCheckingParameters
 }
 
 // LedgerResources provides access to ledger artefacts or
@@ -111,6 +114,7 @@ type TxValidator struct {
 	LedgerResources  LedgerResources
 	Dispatcher       Dispatcher
 	CryptoProvider   bccsp.BCCSP
+	StateTrieStorage storage.StorageAdapter // TODO may be it's better to make а manager for checking head existing
 }
 
 var logger = flogging.MustGetLogger("committer.txvalidator")
@@ -139,6 +143,7 @@ func NewTxValidator(
 	pm plugin.Mapper,
 	channelPolicyManagerGetter policies.ChannelPolicyManagerGetter,
 	cryptoProvider bccsp.BCCSP,
+	stateTrieStorage storage.StorageAdapter,
 ) *TxValidator {
 	// Encapsulates interface implementation
 	pluginValidator := plugindispatcher.NewPluginValidator(pm, ler, &dynamicDeserializer{cr: cr}, &dynamicCapabilities{cr: cr}, channelPolicyManagerGetter, cor)
@@ -149,6 +154,7 @@ func NewTxValidator(
 		LedgerResources:  ler,
 		Dispatcher:       plugindispatcher.New(channelID, cr, ler, lcr, pluginValidator),
 		CryptoProvider:   cryptoProvider,
+		StateTrieStorage: stateTrieStorage,
 	}
 }
 
@@ -417,6 +423,35 @@ func (v *TxValidator) validateTx(req *blockValidationRequest, results chan<- *bl
 				return
 			}
 			logger.Infow("Config transaction validated and applied to channel resources", "channel", channel)
+		} else if common.HeaderType(chdr.Type) == common.HeaderType_ATTESTATION_RESULT {
+			logger.Debug("Attestation transaction received")
+
+			if v.StateTrieStorage == nil {
+				return
+			}
+
+			attestationResult := &common.AttestationResultEnvelope{}
+			err = proto.Unmarshal(payload.Data, attestationResult)
+			if err != nil {
+				logger.Errorf("Error while unmarshaling attestation result message for channel %s, error: %s", v.ChannelID, err)
+				return
+			}
+
+			if !v.checkProof(attestationResult.Proof, attestationResult.ChosenTrieHead, attestationResult.GetBlockNumber()) {
+				logger.Errorf("Chosen trie head is not correct for block number: %d channel: %s", attestationResult.GetBlockNumber(), v.ChannelID)
+			}
+
+			if v.StateTrieStorage.Has(attestationResult.ChosenTrieHead) {
+				logger.Info("Successful validation of an attestation result")
+			} else {
+				logger.Errorf("There is no trie head for block number: %d channel: %s", attestationResult.GetBlockNumber(), v.ChannelID)
+			}
+
+			results <- &blockValidationResult{
+				tIdx: tIdx,
+				txid: txID,
+			}
+			return
 		} else {
 			logger.Warningf("Unknown transaction type [%s] in block number [%d] transaction index [%d]",
 				common.HeaderType(chdr.Type), block.Header.Number, tIdx)
@@ -450,6 +485,38 @@ func (v *TxValidator) validateTx(req *blockValidationRequest, results chan<- *bl
 		}
 		return
 	}
+}
+
+func (v *TxValidator) checkProof(proof []*common.Envelope, chosenHead []byte, blockNum uint64) bool {
+	var correctMessagesInProof uint32
+	for _, p := range proof {
+		_, code := validation.ValidateTransaction(p, v.CryptoProvider)
+		if code != peer.TxValidationCode_VALID {
+			logger.Errorf("Proof contains invalid envelope %s", code)
+			return false
+		}
+
+		message := &common.AttestationEnvelope{}
+		_, err := protoutil.UnmarshalEnvelopeOfType(p, common.HeaderType_ATTESTATION, message)
+		if err != nil {
+			logger.Errorf("error while unmarshaling attestation message: %s", err)
+			return false
+		}
+		if blockNum != message.GetBlockNumber() {
+			logger.Errorf("proof contains message for block number %d, expected block number is %d", message.GetBlockNumber(), blockNum)
+			return false
+		}
+		if string(message.GetTrieHead()) == string(chosenHead) {
+			correctMessagesInProof++
+		}
+	}
+
+	if v.ChannelResources.AttestationCheckingParameters().RequiredNumberOfMessages() != correctMessagesInProof {
+		logger.Errorf("proof contains only %d correct messages, expected %d", correctMessagesInProof, v.ChannelResources.AttestationCheckingParameters().RequiredNumberOfMessages())
+		return false
+	}
+
+	return true
 }
 
 // CheckTxIdDupsLedger returns a vlockValidationResult enhanced with the respective

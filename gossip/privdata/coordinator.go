@@ -9,7 +9,7 @@ package privdata
 import (
 	"time"
 
-	"github.com/hyperledger/fabric-protos-go/common"
+	cb "github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
 	"github.com/hyperledger/fabric-protos-go/peer"
 	protostransientstore "github.com/hyperledger/fabric-protos-go/transientstore"
@@ -25,6 +25,7 @@ import (
 	"github.com/hyperledger/fabric/gossip/util"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
 )
 
 const pullRetrySleepInterval = time.Second
@@ -51,7 +52,7 @@ type Committer interface {
 type Coordinator interface {
 	// StoreBlock deliver new block with underlined private data
 	// returns missing transaction ids
-	StoreBlock(block *common.Block, data util.PvtDataCollections) error
+	StoreBlock(block *cb.Block, data util.PvtDataCollections) error
 
 	// StorePvtData used to persist private data into transient store
 	StorePvtData(txid string, privData *protostransientstore.TxPvtReadWriteSetWithConfigInfo, blckHeight uint64) error
@@ -61,7 +62,7 @@ type Coordinator interface {
 	// The order of private data in slice of PvtDataCollections doesn't imply the order of
 	// transactions in the block related to these private data, to get the correct placement
 	// need to read TxPvtData.SeqInBlock field
-	GetPvtDataAndBlockByNum(seqNum uint64, peerAuth protoutil.SignedData) (*common.Block, util.PvtDataCollections, error)
+	GetPvtDataAndBlockByNum(seqNum uint64, peerAuth protoutil.SignedData) (*cb.Block, util.PvtDataCollections, error)
 
 	// Get recent block sequence number
 	LedgerHeight() (uint64, error)
@@ -94,6 +95,11 @@ type CapabilityProvider interface {
 	Capabilities() channelconfig.ApplicationCapabilities
 }
 
+//go:generate mockery -dir ./ -name AttestationCheckingParametersProvider -case underscore -output mocks/
+type AttestationCheckingParametersProvider interface {
+	AttestationCheckingParameters() channelconfig.AttestationCheckingParameters
+}
+
 // Support encapsulates set of interfaces to
 // aggregate required functionality by single struct
 type Support struct {
@@ -103,6 +109,8 @@ type Support struct {
 	committer.Committer
 	Fetcher
 	CapabilityProvider
+	*mpt.Trie
+	AttestationCheckingParametersProvider
 }
 
 // CoordinatorConfig encapsulates the config that is passed to a new coordinator
@@ -129,11 +137,12 @@ type coordinator struct {
 	pullRetryThreshold             time.Duration
 	skipPullingInvalidTransactions bool
 	idDeserializerFactory          IdentityDeserializerFactory
+	attestationMessageSender       AttestationMessageSender
 }
 
 // NewCoordinator creates a new instance of coordinator
 func NewCoordinator(mspID string, support Support, store *transientstore.Store, selfSignedData protoutil.SignedData, metrics *metrics.PrivdataMetrics,
-	config CoordinatorConfig, idDeserializerFactory IdentityDeserializerFactory) Coordinator {
+	config CoordinatorConfig, idDeserializerFactory IdentityDeserializerFactory, attestationMessageSender AttestationMessageSender) Coordinator {
 	return &coordinator{
 		Support:                        support,
 		mspID:                          mspID,
@@ -145,11 +154,12 @@ func NewCoordinator(mspID string, support Support, store *transientstore.Store, 
 		pullRetryThreshold:             config.PullRetryThreshold,
 		skipPullingInvalidTransactions: config.SkipPullingInvalidTransactions,
 		idDeserializerFactory:          idDeserializerFactory,
+		attestationMessageSender:       attestationMessageSender,
 	}
 }
 
 // StoreBlock stores block with private data into the ledger
-func (c *coordinator) StoreBlock(block *common.Block, privateDataSets util.PvtDataCollections) error {
+func (c *coordinator) StoreBlock(block *cb.Block, privateDataSets util.PvtDataCollections) error {
 	if block.Data == nil {
 		return errors.New("Block data is empty")
 	}
@@ -158,6 +168,13 @@ func (c *coordinator) StoreBlock(block *common.Block, privateDataSets util.PvtDa
 	}
 
 	c.logger.Infof("Received block [%d] from buffer", block.Header.Number)
+
+	if c.shouldSendAttestationMessage(block) {
+		err := c.sendAttestationMessage(block.Header.GetNumber())
+		if err != nil {
+			return err
+		}
+	}
 
 	c.logger.Debugf("Validating block [%d]", block.Header.Number)
 
@@ -236,6 +253,27 @@ func (c *coordinator) StoreBlock(block *common.Block, privateDataSets util.PvtDa
 	return nil
 }
 
+func (c *coordinator) shouldSendAttestationMessage(block *cb.Block) bool {
+	if !c.Support.AttestationCheckingParameters().EnableChecking() {
+		return false
+	}
+	return block.Header.GetNumber()%uint64(c.Support.AttestationCheckingParameters().Frequency()) == 0 && block.Header.GetNumber() != 0
+}
+
+func (c *coordinator) sendAttestationMessage(lastBlockNumber uint64) error {
+	if c.Support.Trie == nil {
+		return nil
+	}
+
+	trieHead := c.Support.Trie.RootHash()
+	if trieHead == nil {
+		c.logger.Errorf("Trie head is nil for block %d", lastBlockNumber)
+		return nil
+	}
+
+	return c.attestationMessageSender.Send(lastBlockNumber, trieHead)
+}
+
 // StorePvtData used to persist private data into transient store
 func (c *coordinator) StorePvtData(txID string, privData *protostransientstore.TxPvtReadWriteSetWithConfigInfo, blkHeight uint64) error {
 	return c.store.Persist(txID, blkHeight, privData)
@@ -246,7 +284,7 @@ func (c *coordinator) StorePvtData(txID string, privData *protostransientstore.T
 // The order of private data in slice of PvtDataCollections doesn't imply the order of
 // transactions in the block related to these private data, to get the correct placement
 // need to read TxPvtData.SeqInBlock field
-func (c *coordinator) GetPvtDataAndBlockByNum(seqNum uint64, peerAuthInfo protoutil.SignedData) (*common.Block, util.PvtDataCollections, error) {
+func (c *coordinator) GetPvtDataAndBlockByNum(seqNum uint64, peerAuthInfo protoutil.SignedData) (*cb.Block, util.PvtDataCollections, error) {
 	blockAndPvtData, err := c.Committer.GetPvtDataAndBlockByNum(seqNum)
 	if err != nil {
 		return nil, nil, err
@@ -291,13 +329,13 @@ func (c *coordinator) GetPvtDataAndBlockByNum(seqNum uint64, peerAuthInfo protou
 
 // getTxPvtdataInfoFromBlock parses the block transactions and returns the list of private data items in the block.
 // Note that this peer's eligibility for the private data is not checked here.
-func (c *coordinator) getTxPvtdataInfoFromBlock(block *common.Block) ([]*ledger.TxPvtdataInfo, error) {
+func (c *coordinator) getTxPvtdataInfoFromBlock(block *cb.Block) ([]*ledger.TxPvtdataInfo, error) {
 	txPvtdataItemsFromBlock := []*ledger.TxPvtdataInfo{}
 
-	if block.Metadata == nil || len(block.Metadata.Metadata) <= int(common.BlockMetadataIndex_TRANSACTIONS_FILTER) {
+	if block.Metadata == nil || len(block.Metadata.Metadata) <= int(cb.BlockMetadataIndex_TRANSACTIONS_FILTER) {
 		return nil, errors.New("Block.Metadata is nil or Block.Metadata lacks a Tx filter bitmap")
 	}
-	txsFilter := txValidationFlags(block.Metadata.Metadata[common.BlockMetadataIndex_TRANSACTIONS_FILTER])
+	txsFilter := txValidationFlags(block.Metadata.Metadata[cb.BlockMetadataIndex_TRANSACTIONS_FILTER])
 	data := block.Data.Data
 	if len(txsFilter) != len(block.Data.Data) {
 		return nil, errors.Errorf("block data size(%d) is different from Tx filter size(%d)", len(block.Data.Data), len(txsFilter))
@@ -434,7 +472,7 @@ func getTxInfoFromTransactionBytes(envBytes []byte) (*txInfo, error) {
 	txInfo.channelID = chdr.ChannelId
 	txInfo.txID = chdr.TxId
 
-	if chdr.Type != int32(common.HeaderType_ENDORSER_TRANSACTION) {
+	if chdr.Type != int32(cb.HeaderType_ENDORSER_TRANSACTION) {
 		err := errors.New("header type is not an endorser transaction")
 		logger.Debugf("Invalid transaction type: %s", err)
 		return nil, err

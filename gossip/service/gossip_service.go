@@ -36,6 +36,7 @@ import (
 	"github.com/hyperledger/fabric/internal/pkg/peer/orderers"
 	"github.com/hyperledger/fabric/protoutil"
 	"github.com/pkg/errors"
+	"github.com/vldmkr/merkle-patricia-trie/mpt"
 	"google.golang.org/grpc"
 )
 
@@ -173,6 +174,7 @@ type GossipService struct {
 	serviceConfig     *ServiceConfig
 	privdataConfig    *gossipprivdata.PrivdataConfig
 	anchorPeerTracker *anchorPeerTracker
+	signer            identity.SignerSerializer
 }
 
 // This is an implementation of api.JoinChannelMessage.
@@ -280,6 +282,7 @@ func New(
 		serviceConfig:     serviceConfig,
 		privdataConfig:    privdataConfig,
 		anchorPeerTracker: anchorPeerTracker,
+		signer:            peerIdentity,
 	}, nil
 }
 
@@ -314,11 +317,13 @@ func (g *GossipService) NewConfigEventer() ConfigProcessor {
 // Support aggregates functionality of several
 // interfaces required by gossip service
 type Support struct {
-	Validator            txvalidator.Validator
-	Committer            committer.Committer
-	CollectionStore      privdata.CollectionStore
-	IdDeserializeFactory gossipprivdata.IdentityDeserializerFactory
-	CapabilityProvider   gossipprivdata.CapabilityProvider
+	Validator                             txvalidator.Validator
+	Committer                             committer.Committer
+	CollectionStore                       privdata.CollectionStore
+	IdDeserializeFactory                  gossipprivdata.IdentityDeserializerFactory
+	CapabilityProvider                    gossipprivdata.CapabilityProvider
+	StateTrie                             *mpt.Trie
+	AttestationCheckingParametersProvider gossipprivdata.AttestationCheckingParametersProvider
 }
 
 // InitializeChannel allocates the state provider and should be invoked once per channel per execution
@@ -342,15 +347,23 @@ func (g *GossipService) InitializeChannel(channelID string, ordererSource *order
 	}
 	selfSignedData := g.createSelfSignedData()
 	mspID := string(g.secAdv.OrgByPeerIdentity(selfSignedData.Identity))
+
+	var attestationMessageSender gossipprivdata.AttestationMessageSender
+	if support.AttestationCheckingParametersProvider.AttestationCheckingParameters().EnableChecking() {
+		attestationMessageSender = gossipprivdata.NewAttestationMessageSender(channelID, g.signer, ordererSource)
+	}
+
 	coordinator := gossipprivdata.NewCoordinator(mspID, gossipprivdata.Support{
-		ChainID:            channelID,
-		CollectionStore:    support.CollectionStore,
-		Validator:          support.Validator,
-		Committer:          support.Committer,
-		Fetcher:            fetcher,
-		CapabilityProvider: support.CapabilityProvider,
+		ChainID:                               channelID,
+		CollectionStore:                       support.CollectionStore,
+		Validator:                             support.Validator,
+		Committer:                             support.Committer,
+		Fetcher:                               fetcher,
+		CapabilityProvider:                    support.CapabilityProvider,
+		Trie:                                  support.StateTrie,
+		AttestationCheckingParametersProvider: support.AttestationCheckingParametersProvider,
 	}, store, selfSignedData, g.metrics.PrivdataMetrics, coordinatorConfig,
-		support.IdDeserializeFactory)
+		support.IdDeserializeFactory, attestationMessageSender)
 
 	var reconciler gossipprivdata.PvtDataReconciler
 

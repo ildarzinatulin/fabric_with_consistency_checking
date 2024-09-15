@@ -14,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/vldmkr/merkle-patricia-trie/storage"
+
 	"github.com/hyperledger/fabric-protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/ledger/rwset"
 	"github.com/hyperledger/fabric-protos-go/ledger/rwset/kvrwset"
@@ -190,6 +192,7 @@ func setupValidatorWithMspMgr(mspmgr msp.MSPManager, mockID *supportmocks.Identi
 		pm,
 		mockCpmg,
 		cryptoProvider,
+		storage.NewMemoryAdapter(),
 	)
 
 	return v, mockQE, mockID, mockCR
@@ -1096,6 +1099,7 @@ func TestValidationInvalidEndorsing(t *testing.T) {
 		pm,
 		mockCpmg,
 		cryptoProvider,
+		storage.NewMemoryAdapter(),
 	)
 
 	tx := getEnv(ccID, nil, createRWset(t, ccID), t)
@@ -1170,6 +1174,7 @@ func TestValidationPluginExecutionError(t *testing.T) {
 		pm,
 		mockCpmg,
 		cryptoProvider,
+		storage.NewMemoryAdapter(),
 	)
 
 	tx := getEnv(ccID, nil, createRWset(t, ccID), t)
@@ -1223,6 +1228,7 @@ func TestValidationPluginNotFound(t *testing.T) {
 		pm,
 		mockCpmg,
 		cryptoProvider,
+		storage.NewMemoryAdapter(),
 	)
 
 	tx := getEnv(ccID, nil, createRWset(t, ccID), t)

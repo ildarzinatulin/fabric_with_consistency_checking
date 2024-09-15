@@ -95,6 +95,8 @@ func validateChannelHeader(cHdr *common.ChannelHeader) error {
 	case common.HeaderType_ENDORSER_TRANSACTION:
 	case common.HeaderType_CONFIG_UPDATE:
 	case common.HeaderType_CONFIG:
+	case common.HeaderType_ATTESTATION_RESULT:
+	case common.HeaderType_ATTESTATION:
 	default:
 		return errors.Errorf("invalid header type %s", common.HeaderType(cHdr.Type))
 	}
@@ -313,6 +315,10 @@ func ValidateTransaction(e *common.Envelope, cryptoProvider bccsp.BCCSP) (*commo
 			putilsLogger.Errorf("validateConfigTransaction returns err %s", err)
 			return payload, pb.TxValidationCode_INVALID_CONFIG_TRANSACTION
 		}
+		return payload, pb.TxValidationCode_VALID
+	case common.HeaderType_ATTESTATION_RESULT:
+		return payload, pb.TxValidationCode_VALID
+	case common.HeaderType_ATTESTATION:
 		return payload, pb.TxValidationCode_VALID
 	default:
 		return nil, pb.TxValidationCode_UNSUPPORTED_TX_PAYLOAD
